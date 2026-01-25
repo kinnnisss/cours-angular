@@ -2,15 +2,14 @@ import { Component } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+
 import { PaginationComponent } from '../../../shared/ui/pagination/pagination.component';
-
-
 import { DEMANDES_MOCK, DemandeRv, DemandeStatus } from '../../../shared/mock-data';
 
 @Component({
   selector: 'app-list-demande',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink,PaginationComponent],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent],
   templateUrl: './list-demande.component.html',
   styleUrl: './list-demande.component.css'
 })
@@ -24,8 +23,7 @@ export class ListDemandeComponent {
   currentPage = 1;
 
   get specialites(): string[] {
-    const set = new Set(this.demandes.map(d => d.specialite));
-    return Array.from(set).sort();
+    return Array.from(new Set(this.demandes.map(d => d.specialite))).sort();
   }
 
   get filteredDemandes(): DemandeRv[] {
@@ -50,7 +48,6 @@ export class ListDemandeComponent {
   }
 
   goToPage(p: number): void {
-    if (p < 1 || p > this.totalPages) return;
     this.currentPage = p;
   }
 
@@ -76,9 +73,5 @@ export class ListDemandeComponent {
       case 'accepte': return 'Acceptée';
       case 'refuse': return 'Refusée';
     }
-  }
-
-  pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 }
