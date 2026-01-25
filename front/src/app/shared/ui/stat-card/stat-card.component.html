@@ -1,0 +1,18 @@
+<div class="card border-0 shadow-sm h-100">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h6 class="text-muted">{{ title }}</h6>
+        <h3 class="mb-0">{{ value }}</h3>
+      </div>
+
+      <div class="bg-opacity-25 p-3 rounded" [class]="bgToneClass + ' bg-opacity-25'">
+        <i class="fs-3" [class]="iconClass + ' ' + textToneClass"></i>
+      </div>
+    </div>
+
+    <p class="mt-2 mb-0" [class]="noteClass" *ngIf="noteText">
+      <i [class]="noteIconClass"></i> {{ noteText }}
+    </p>
+  </div>
+</div>

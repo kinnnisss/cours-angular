@@ -1,0 +1,70 @@
+<div class="card border-0 shadow-sm rv-card">
+
+  <div [class]="headerClass(rv.status)">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <div class="fw-bold">
+          <i [class]="statusIcon(rv.status)"></i>
+          {{ statusLabel(rv.status) }}
+        </div>
+        <div class="small opacity-75">{{ rv.specialite }}</div>
+        <div class="small opacity-75">{{ rv.medecin }}</div>
+      </div>
+
+      <span [class]="badgeClass(rv.status)">
+        {{ statusLabel(rv.status) }}
+      </span>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="rv-line">
+      <i class="bi bi-person"></i>
+      <span><strong>Patient:</strong> {{ rv.patientNom }}</span>
+    </div>
+
+    <div class="rv-line">
+      <i class="bi bi-calendar"></i>
+      <span><strong>Date:</strong> {{ rv.dateIso | date:'dd/MM/yyyy' }}</span>
+    </div>
+
+    <div class="rv-line">
+      <i class="bi bi-clock"></i>
+      <span><strong>Heure:</strong> {{ rv.heure }}</span>
+    </div>
+
+    <div class="rv-line">
+      <i class="bi bi-geo-alt"></i>
+      <span><strong>Lieu:</strong> {{ rv.lieu }}</span>
+    </div>
+
+    <div class="rv-line" *ngIf="rv.notes">
+      <i class="bi bi-journal-text"></i>
+      <span><strong>Notes:</strong> {{ rv.notes }}</span>
+    </div>
+  </div>
+
+  <div class="card-footer bg-white border-0 pt-0">
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary flex-fill"
+         [routerLink]="[detailsLinkBase, rv.id]">
+        <i class="bi bi-eye"></i> Détails
+      </a>
+
+      <button class="btn btn-outline-danger"
+              type="button"
+              *ngIf="canCancel()"
+              (click)="onCancel()">
+        <i class="bi bi-x-circle"></i> Annuler
+      </button>
+
+      <button class="btn btn-outline-info"
+              type="button"
+              *ngIf="canReport()"
+              (click)="onReport()">
+        <i class="bi bi-file-earmark-text"></i> Rapport
+      </button>
+    </div>
+  </div>
+
+</div>

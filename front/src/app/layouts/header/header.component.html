@@ -1,0 +1,97 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" [routerLink]="['/dashboard']">
+      <i class="bi bi-hospital"></i> Gestion RV Médicaux
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/dashboard']"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="bi bi-speedometer2"></i> Tableau de bord
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/demandes-rv/new']"
+            routerLinkActive="active"
+          >
+            <i class="bi bi-calendar-event"></i> Demander RV
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/demandes-rv']"
+            routerLinkActive="active"
+          >
+            <i class="bi bi-list-check"></i> Mes Demandes
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/mes-rv']"
+            routerLinkActive="active"
+          >
+            <i class="bi bi-calendar-check"></i> Mes RV
+          </a>
+        </li>
+      </ul>
+
+      <div class="d-flex">
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-light dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-person-circle"></i> {{ userLabel }}
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" [routerLink]="['/patients']">
+                <i class="bi bi-people"></i> Mes Informations
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" [routerLink]="['/settings']">
+                <i class="bi bi-gear"></i> Paramètres
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" [routerLink]="['/login']">
+                <i class="bi bi-box-arrow-right"></i> Déconnexion
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</nav>

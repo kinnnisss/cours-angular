@@ -1,0 +1,77 @@
+<div class="container-fluid py-4">
+  <h1 class="mb-4">Tableau de bord</h1>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-3" *ngFor="let s of stats">
+    <app-stat-card
+      [title]="s.title"
+      [value]="s.value"
+      [iconClass]="s.iconClass"
+      [bgToneClass]="s.bgToneClass"
+      [textToneClass]="s.textToneClass"
+      [noteText]="s.noteText"
+      [noteIconClass]="s.noteIconClass"
+      [noteClass]="noteClass(s.noteType)">
+    </app-stat-card>
+  </div>
+</div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-calendar-event"></i> Prochain RV
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <div class="appointment-item">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <div class="bg-primary bg-opacity-25 p-3 rounded text-center">
+                  <div class="text-primary fw-bold">{{ nextAppointment.day }}</div>
+                  <small class="text-muted">{{ nextAppointment.month }}</small>
+                </div>
+              </div>
+
+              <div class="col">
+                <h6 class="mb-1">{{ nextAppointment.speciality }}</h6>
+                <p class="text-muted mb-1 small">{{ nextAppointment.doctor }}</p>
+                <p class="text-muted mb-0 small">
+                  <i class="bi bi-clock"></i>
+                  {{ nextAppointment.time }} - {{ nextAppointment.statusLabel }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-info-circle"></i> Actions Rapides
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <a [routerLink]="routes.newRdv" class="btn btn-outline-primary w-100 mb-2">
+            <i class="bi bi-plus-circle"></i> Nouvelle Demande RV
+          </a>
+
+          <!-- <a [routerLink]="routes.createPatient" class="btn btn-outline-primary w-100 mb-2">
+            <i class="bi bi-person-plus"></i> Créer un Patient
+          </a>
+
+          <a [routerLink]="routes.listPatients" class="btn btn-outline-primary w-100">
+            <i class="bi bi-people"></i> Voir mes Patients
+          </a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

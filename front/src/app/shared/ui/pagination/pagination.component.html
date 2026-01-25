@@ -1,0 +1,17 @@
+<nav class="mt-4" aria-label="Page navigation" *ngIf="totalPages > 1">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <button class="page-link" type="button" (click)="goTo(currentPage - 1)">Précédent</button>
+    </li>
+
+    <li class="page-item"
+        *ngFor="let p of pages()"
+        [class.active]="p === currentPage">
+      <button class="page-link" type="button" (click)="goTo(p)">{{ p }}</button>
+    </li>
+
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <button class="page-link" type="button" (click)="goTo(currentPage + 1)">Suivant</button>
+    </li>
+  </ul>
+</nav>

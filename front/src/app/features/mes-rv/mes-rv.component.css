@@ -1,0 +1,28 @@
+.rv-card {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.rv-header {
+  padding: 14px 16px;
+  color: #fff;
+}
+
+.rv-header.confirme { background: #198754; }
+.rv-header.realise { background: #0dcaf0; }
+.rv-header.en_attente { background: #ffc107; color: #1f1f1f; }
+.rv-header.annule { background: #dc3545; }
+
+.rv-line {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 0;
+  color: #333;
+}
+
+.rv-line i {
+  width: 18px;
+  text-align: center;
+  opacity: 0.75;
+}
