@@ -15,8 +15,9 @@ export const routes: Routes = [
 //   { path: 'patients/create', loadComponent: () => import('./features/patients/create/create-patient.component').then(m => m.CreatePatientComponent) },
 { path: 'mes-rv', loadComponent: () => import('./features/mes-rv/mes-rv.component').then(m => m.MesRvComponent) },
   { path: 'settings', loadComponent: () => import('./shared/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
-  { path: 'login', loadComponent: () => import('./shared/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
+{ path: 'login', loadComponent: () => import('./features/login/login.component').then(m => m.LoginComponent) },
 
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
+
   
 ];

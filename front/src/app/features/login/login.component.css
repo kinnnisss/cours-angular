@@ -1,0 +1,10 @@
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+}
+
+.logo-icon {
+  font-size: 3rem;
+  color: #0d6efd;
+}

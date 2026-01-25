@@ -1,0 +1,69 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card login-card border-0 shadow-sm">
+    <div class="card-body p-4 p-md-5">
+
+      <div class="text-center mb-4">
+        <div class="bg-primary bg-opacity-25 p-3 rounded-circle d-inline-block mb-3">
+          <i class="bi bi-hospital logo-icon"></i>
+        </div>
+        <p class="text-muted small mb-1">Bienvenue sur</p>
+        <p class="text-primary fw-bold mb-0">Système de Gestion de Rendez-vous Médicaux</p>
+      </div>
+
+      <h2 class="text-center mb-4">Se connecter</h2>
+
+      <div class="alert alert-danger" *ngIf="errorMsg">
+        <i class="bi bi-exclamation-triangle"></i> {{ errorMsg }}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="mb-3">
+          <label class="form-label">Login</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="username"
+            placeholder="Email ou nom d'utilisateur"
+            [class.is-invalid]="isInvalid('username')"
+          />
+          <div class="invalid-feedback">Le login est obligatoire.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Mot de passe</label>
+          <input
+            type="password"
+            class="form-control"
+            formControlName="password"
+            placeholder="Mot de passe"
+            [class.is-invalid]="isInvalid('password')"
+          />
+          <div class="invalid-feedback">Mot de passe requis (min 4 caractères).</div>
+        </div>
+
+        <div class="text-end mb-3">
+          <a [routerLink]="['/forgot-password']" class="text-decoration-none small text-primary">
+            Mot de passe oublié?
+          </a>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary text-white">
+            Se connecter
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mt-4">
+        <p class="text-muted small mb-0">
+          Pas encore inscrit?
+          <a [routerLink]="['/register']" class="text-primary text-decoration-none">S'inscrire</a>
+        </p>
+        <p class="text-muted small mt-2 mb-0">
+          <strong>Mock :</strong> patient/1234 ou admin/1234
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
