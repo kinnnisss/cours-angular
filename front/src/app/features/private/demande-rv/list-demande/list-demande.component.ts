@@ -3,8 +3,8 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { PaginationComponent } from '../../../shared/ui/pagination/pagination.component';
-import { DEMANDES_MOCK, DemandeRv, DemandeStatus } from '../../../shared/mock-data';
+import { PaginationComponent } from '../../../../shared/ui/pagination/pagination.component';
+import { DEMANDES_MOCK, DemandeRv, DemandeStatus } from '../../../../shared/mock-data';
 
 @Component({
   selector: 'app-list-demande',

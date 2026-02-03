@@ -46,6 +46,6 @@ export class LoginComponent {
     }
 
     localStorage.setItem('mock_user', username);
-    this.router.navigateByUrl('/dash');
+    this.router.navigateByUrl('/private/dashboard');
   }
 }

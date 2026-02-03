@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container-fluid">
-    <a class="navbar-brand" [routerLink]="['/dashboard']">
+    <a class="navbar-brand" [routerLink]="['/private/dashboard']">
       <i class="bi bi-hospital"></i> Gestion RV Médicaux
     </a>
 
@@ -21,7 +21,7 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            [routerLink]="['/dashboard']"
+            [routerLink]="['/private/dashboard']"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
           >
@@ -32,7 +32,7 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            [routerLink]="['/demandes-rv/new']"
+            [routerLink]="['/private/demandes-rv/new']"
             routerLinkActive="active"
           >
             <i class="bi bi-calendar-event"></i> Demander RV
@@ -42,7 +42,7 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            [routerLink]="['/demandes-rv']"
+            [routerLink]="['/private/demandes-rv']"
             routerLinkActive="active"
           >
             <i class="bi bi-list-check"></i> Mes Demandes
@@ -52,7 +52,7 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            [routerLink]="['/mes-rv']"
+            [routerLink]="['/private/mes-rv']"
             routerLinkActive="active"
           >
             <i class="bi bi-calendar-check"></i> Mes RV
@@ -73,18 +73,18 @@
 
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" [routerLink]="['/patients']">
+              <a class="dropdown-item" [routerLink]="['/private/patients']">
                 <i class="bi bi-people"></i> Mes Informations
               </a>
             </li>
             <li>
-              <a class="dropdown-item" [routerLink]="['/settings']">
+              <a class="dropdown-item" [routerLink]="['/private/settings']">
                 <i class="bi bi-gear"></i> Paramètres
               </a>
             </li>
             <li><hr class="dropdown-divider" /></li>
             <li>
-              <a class="dropdown-item" [routerLink]="['/login']">
+              <a class="dropdown-item" [routerLink]="['/public/login']">
                 <i class="bi bi-box-arrow-right"></i> Déconnexion
               </a>
             </li>

@@ -1,23 +1,51 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { FormDemandeComponent } from './features/demande-rv/form-demande/form-demande.component';
-import { ListDemandeComponent } from './features/demande-rv/list-demande/list-demande.component';
+
+import { DashboardComponent } from './features/private/dashboard/dashboard.component';
+import { FormDemandeComponent } from './features/private/demande-rv/form-demande/form-demande.component';
+import { ListDemandeComponent } from './features/private/demande-rv/list-demande/list-demande.component';
+import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
+import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
+
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', pathMatch: 'full', redirectTo: 'public/login' },
 
-  { path: 'dashboard', component: DashboardComponent },
-//   { path: 'demande-rv', component: FormDemandeComponent },
-{ path: 'demandes-rv', component: ListDemandeComponent },
-{ path: 'demandes-rv/new', component: FormDemandeComponent },
+  {
+    path: 'public',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./features/public/login/login.component').then(m => m.LoginComponent),
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'login' },
+    ],
+  },
+  {
+    path: 'private',
+    component: PrivateLayoutComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
 
-//   { path: 'patients', loadComponent: () => import('./features/patients/list/patients-list.component').then(m => m.PatientsListComponent) },
-//   { path: 'patients/create', loadComponent: () => import('./features/patients/create/create-patient.component').then(m => m.CreatePatientComponent) },
-{ path: 'mes-rv', loadComponent: () => import('./features/mes-rv/mes-rv.component').then(m => m.MesRvComponent) },
-  { path: 'settings', loadComponent: () => import('./shared/placeholder/placeholder.component').then(m => m.PlaceholderComponent) },
-{ path: 'login', loadComponent: () => import('./features/login/login.component').then(m => m.LoginComponent) },
+      { path: 'demandes-rv', component: ListDemandeComponent },
+      { path: 'demandes-rv/new', component: FormDemandeComponent },
 
-  { path: '', pathMatch: 'full', redirectTo: 'login' },
+      {
+        path: 'mes-rv',
+        loadComponent: () =>
+          import('./features/private/mes-rv/mes-rv.component').then(m => m.MesRvComponent),
+      },
 
-  
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./shared/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+      },
+
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+    ],
+  },
+
+  { path: '**', redirectTo: 'public/login' },
 ];

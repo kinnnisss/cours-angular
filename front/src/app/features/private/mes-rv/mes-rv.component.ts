@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { RdvCardComponent } from '../../shared/ui/rdv-card/rdv-card.component';
+import { RdvCardComponent } from '../../../shared/ui/rdv-card/rdv-card.component';
 
-import { RDVS_MOCK, RendezVous, RvStatus } from '../../shared/mock-data';
+import { RDVS_MOCK, RendezVous, RvStatus } from '../../../shared/mock-data';
 
 @Component({
   selector: 'app-mes-rv',
