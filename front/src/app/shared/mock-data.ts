@@ -1,38 +1,14 @@
 // src/app/shared/mock-data.ts
 
-// -------- TYPES COMMUNS --------
-export type DemandeStatus = 'en_attente' | 'accepte' | 'refuse';
-export type RvStatus = 'confirme' | 'realise' | 'en_attente' | 'annule';
+import type { DemandeRv } from '../features/private/demande-rv/model/demande-rv.model';
+import type { DemandeStatus } from '../features/private/demande-rv/model/demande-status.type';
+import type { RendezVous } from '../features/private/mes-rv/model/rendezvous.model';
+import type { RvStatus } from '../features/private/mes-rv/model/rv-status.type';
 
 export interface Patient {
   id: string;
   nom: string;
 }
-
-export interface DemandeRv {
-  id: string;
-  patientId: string;
-  patientNom: string;
-  specialite: string;
-  date: string;
-  heure: string;
-  status: DemandeStatus;
-}
-
-export interface RendezVous {
-  id: string;
-  patientId: string;
-  patientNom: string;
-  specialite: string;
-  medecin: string;
-  dateIso: string;
-  heure: string;
-  lieu: string;
-  notes?: string;
-  status: RvStatus;
-}
-
-// -------- LISTES “BASE DE DONNÉES” --------
 
 
 export const PATIENTS_MOCK: Patient[] = [
@@ -47,7 +23,6 @@ export const PATIENTS_MOCK: Patient[] = [
   { id: 'PAT-009', nom: 'Khady Ba' },
   { id: 'PAT-010', nom: 'Cheikh Seck' },
 ];
-
 
 const SPECIALITES = [
   'Médecin Généraliste',
@@ -75,28 +50,22 @@ const LIEUX = [
   'Hôpital Principal',
 ];
 
-
 function pad2(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }
-
 
 function frDate(day: number, month: number, year = 2026): string {
   return `${pad2(day)}/${pad2(month)}/${year}`;
 }
 
-
 function isoDate(day: number, month: number, year = 2026): string {
   return `${year}-${pad2(month)}-${pad2(day)}`;
 }
-
 
 function timeSlot(i: number): string {
   const slots = ['08:30','09:00','09:15','10:00','10:30','11:00','14:00','14:30','15:00','16:00'];
   return slots[i % slots.length];
 }
-
-// -------- GÉNÉRATION DE DONNÉES EN NOMBRE --------
 
 
 export const DEMANDES_MOCK: DemandeRv[] = Array.from({ length: 22 }, (_, i) => {
@@ -112,7 +81,7 @@ export const DEMANDES_MOCK: DemandeRv[] = Array.from({ length: 22 }, (_, i) => {
   const month = i % 2 === 0 ? 1 : 2;
 
   return {
-    id: `DEM-${pad2(Math.floor((i + 1) / 1)).padStart(4,'0')}`,
+    id: `DEM-${pad2(i + 1).padStart(4, '0')}`,
     patientId: p.id,
     patientNom: p.nom,
     specialite,

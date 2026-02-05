@@ -2,20 +2,24 @@ import { Component } from '@angular/core';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+
 import { RdvCardComponent } from '../../../shared/ui/rdv-card/rdv-card.component';
 
-import { RDVS_MOCK, RendezVous, RvStatus } from '../../../shared/mock-data';
+import type { RendezVous } from './model/rendezvous.model';
+import type { RvStatus } from './model/rv-status.type';
+
+import { mesRvService } from './service/mes-rv.instance';
 
 @Component({
   selector: 'app-mes-rv',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink, DatePipe,RdvCardComponent],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, DatePipe, RdvCardComponent],
   templateUrl: './mes-rv.component.html',
   styleUrl: './mes-rv.component.css'
 })
 export class MesRvComponent {
 
-  rdvs: RendezVous[] = RDVS_MOCK;
+  rdvs: RendezVous[] = mesRvService.getAll();
 
   filterStatus: '' | RvStatus = '';
   filterMonth: '' | string = '';
@@ -38,7 +42,8 @@ export class MesRvComponent {
     });
   }
 
-  onFilterChange(): void {}
+  onFilterChange(): void {
+  }
 
   monthLabel(yyyyMm: string): string {
     const [y, m] = yyyyMm.split('-').map(Number);
@@ -83,8 +88,9 @@ export class MesRvComponent {
   }
 
   cancelRv(rv: RendezVous): void {
-    if (rv.status === 'annule' || rv.status === 'realise') return;
-    rv.status = 'annule';
+    mesRvService.cancel(rv.id);
+
+    this.rdvs = mesRvService.getAll();
   }
 
   downloadReport(rv: RendezVous): void {

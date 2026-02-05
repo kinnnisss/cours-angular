@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { PaginationComponent } from '../../../../shared/ui/pagination/pagination.component';
-import { DEMANDES_MOCK, DemandeRv, DemandeStatus } from '../../../../shared/mock-data';
+import type { DemandeRv } from '../model/demande-rv.model';
+import type { DemandeStatus } from '../model/demande-status.type';
 
+import { demandeRvService } from '../service/demande-rv.instance';
 @Component({
   selector: 'app-list-demande',
   standalone: true,
@@ -14,7 +16,7 @@ import { DEMANDES_MOCK, DemandeRv, DemandeStatus } from '../../../../shared/mock
   styleUrl: './list-demande.component.css'
 })
 export class ListDemandeComponent {
-  demandes: DemandeRv[] = DEMANDES_MOCK;
+   demandes: DemandeRv[] = demandeRvService.getAll();
 
   filterStatus: '' | DemandeStatus = '';
   filterSpecialite: '' | string = '';
