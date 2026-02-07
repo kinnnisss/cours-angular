@@ -3,7 +3,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { PaginationComponent } from '../../../../shared/ui/pagination/pagination.component';
+import { PaginationComponent } from '@shared/ui/pagination/pagination.component';
 import type { DemandeRv } from '../model/demande-rv.model';
 import type { DemandeStatus } from '../model/demande-status.type';
 

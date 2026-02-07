@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgFor } from '@angular/common';
-import { StatCardComponent } from '../../../shared/ui/stat-card/stat-card.component';
+import { StatCardComponent } from '@shared/ui/stat-card/stat-card.component';
 
 
 
-import { DEMANDES_MOCK } from '../../../shared/mock-data';
+import { DEMANDES_MOCK } from '@mock';
 
 type NoteType = 'success' | 'danger' | 'info' | 'muted';
 

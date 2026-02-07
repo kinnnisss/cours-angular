@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { DashboardComponent } from './features/private/dashboard/dashboard.component';
+import { DashboardComponent } from '@features/private/dashboard/dashboard.component';
 import { FormDemandeComponent } from './features/private/demande-rv/form-demande/form-demande.component';
 import { ListDemandeComponent } from './features/private/demande-rv/list-demande/list-demande.component';
 import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';

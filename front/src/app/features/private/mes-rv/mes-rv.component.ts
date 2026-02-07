@@ -3,7 +3,7 @@ import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { RdvCardComponent } from '../../../shared/ui/rdv-card/rdv-card.component';
+import { RdvCardComponent } from '@shared/ui/rdv-card/rdv-card.component';
 
 import type { RendezVous } from './model/rendezvous.model';
 import type { RvStatus } from './model/rv-status.type';

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import type { RendezVous } from '../model/rendezvous.model';
 import type { RvStatus } from '../model/rv-status.type';
 
-import { RDVS_MOCK } from '../../../../shared/mock-data';
+import { RDVS_MOCK } from '@mock';
 
 @Injectable({ providedIn: 'root' })
 export class MesRvService {

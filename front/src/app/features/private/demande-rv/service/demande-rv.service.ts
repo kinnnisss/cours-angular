@@ -3,7 +3,9 @@ import type { DemandeRv } from '../model/demande-rv.model';
 import type { DemandeRvCreate } from '../model/demande-create.model';
 import type { DemandeStatus } from '../model/demande-status.type';
 
-import { DEMANDES_MOCK } from '../../../../shared/mock-data';
+import { DEMANDES_MOCK } from '@mock';
+
+
 
 @Injectable({ providedIn: 'root' })
 export class DemandeRvService {
