@@ -1,0 +1,18 @@
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">Mes informations</h3>
+      <hr />
+
+      <div *ngIf="user; else noUser">
+        <p><strong>Nom :</strong> {{ user.nom }}</p>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        <p><strong>Rôle :</strong> {{ user.role }}</p>
+      </div>
+
+      <ng-template #noUser>
+        <p class="text-muted">Aucune information disponible. Veuillez vous connecter.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

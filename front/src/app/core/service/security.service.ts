@@ -18,4 +18,13 @@ export class SecurityService {
 
     return undefined;
   }
+  isAuthenticated(): boolean {
+  const token = localStorage.getItem('token');
+  return !!token;
+}
+getCurrentUser(): any {
+  const userStr = localStorage.getItem('user');
+  return userStr ? JSON.parse(userStr) : null;
+}
+
 }
