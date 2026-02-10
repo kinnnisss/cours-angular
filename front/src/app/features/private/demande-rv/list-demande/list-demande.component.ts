@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { PaginationComponent } from '@shared/ui/pagination/pagination.component';
-import type { DemandeRv } from '../model/demande-rv.model';
-import type { DemandeStatus } from '../model/demande-status.type';
+import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
+import type { DemandeStatus } from '@features/private/demande-rv//model/demande-status.type';
 
-import { demandeRvService } from '../service/demande-rv.instance';
+import { demandeRvService } from '@features/private/demande-rv/service/demande-rv.instance';
 @Component({
   selector: 'app-list-demande',
   standalone: true,
@@ -15,8 +15,18 @@ import { demandeRvService } from '../service/demande-rv.instance';
   templateUrl: './list-demande.component.html',
   styleUrl: './list-demande.component.css'
 })
-export class ListDemandeComponent {
-   demandes: DemandeRv[] = demandeRvService.getAll();
+export class ListDemandeComponent implements OnInit, OnDestroy {
+   demandes: DemandeRv[] = [];
+  private loadDemandes():DemandeRv[] {
+    return  [...demandeRvService.getAll()];
+  }
+ngOnInit(): void {
+  this.demandes = this.loadDemandes();
+}
+ngOnDestroy(): void {
+  alert('ListDemandeComponent destroyed');
+}
+  
 
   filterStatus: '' | DemandeStatus = '';
   filterSpecialite: '' | string = '';
