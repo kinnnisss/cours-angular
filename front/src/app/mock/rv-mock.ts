@@ -1,8 +1,8 @@
 import { isoDate,timeSlot } from './helper-mock';
 import { USERS_MOCK } from './user-mock';
-import type { RendezVous } from '../features/private/mes-rv/model/rendezvous.model';
-import { SPECIALITES } from '../features/private/demande-rv/model/specialite.type';
-import type { RvStatus } from '../features/private/mes-rv/model/rv-status.type';
+import type { RendezVous } from '@features/private/mes-rv/model/rendezvous.model';
+import { SPECIALITES } from '@features/private/demande-rv/model/specialite.type';
+import type { RvStatus } from '@features/private/mes-rv/model/rv-status.type';
 const MEDECINS = [
   'Dr. Jean Dupont',
   'Dr. Marie Sow',

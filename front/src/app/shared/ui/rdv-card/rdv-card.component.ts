@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgIf, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import type { RendezVous } from '../../../features/private/mes-rv/model/rendezvous.model';
-import type { RvStatus } from '../../../features/private/mes-rv/model/rv-status.type';
+import type { RendezVous } from '@features/private/mes-rv/model/rendezvous.model';
+import type { RvStatus } from '@features/private/mes-rv/model/rv-status.type';
 
 @Component({
   selector: 'app-rdv-card',

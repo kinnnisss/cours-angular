@@ -1,12 +1,13 @@
 import { Routes } from '@angular/router';
 
 import { DashboardComponent } from '@features/private/dashboard/dashboard.component';
-import { FormDemandeComponent } from './features/private/demande-rv/form-demande/form-demande.component';
-import { ListDemandeComponent } from './features/private/demande-rv/list-demande/list-demande.component';
-import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
-import { PrivateLayoutComponent } from './layouts/private-layout/private-layout.component';
-
-
+import { FormDemandeComponent } from '@features/private/demande-rv/form-demande/form-demande.component';
+import { ListDemandeComponent } from '@features/private/demande-rv/list-demande/list-demande.component';
+import { PublicLayoutComponent } from '@layouts/public-layout/public-layout.component';
+import { PrivateLayoutComponent } from '@layouts/private-layout/private-layout.component';
+import { PlaceholderComponent } from '@shared/placeholder/placeholder.component';
+import { MesRvComponent } from '@features/private/mes-rv/mes-rv.component';
+import { LoginComponent } from '@features/public/login/login.component';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'public/login' },
 
@@ -15,9 +16,7 @@ export const routes: Routes = [
     component: PublicLayoutComponent,
     children: [
       {
-        path: 'login',
-        loadComponent: () =>
-          import('./features/public/login/login.component').then(m => m.LoginComponent),
+        path: 'login',component:LoginComponent,
       },
       { path: '', pathMatch: 'full', redirectTo: 'login' },
     ],
@@ -32,15 +31,11 @@ export const routes: Routes = [
       { path: 'demandes-rv/new', component: FormDemandeComponent },
 
       {
-        path: 'mes-rv',
-        loadComponent: () =>
-          import('./features/private/mes-rv/mes-rv.component').then(m => m.MesRvComponent),
+        path: 'mes-rv',component: MesRvComponent,
       },
 
       {
-        path: 'settings',
-        loadComponent: () =>
-          import('./shared/placeholder/placeholder.component').then(m => m.PlaceholderComponent),
+        path: 'settings',component: PlaceholderComponent,
       },
 
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },

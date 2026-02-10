@@ -23,9 +23,11 @@
       "@mock/*": ["./src/app/mock/*"],
       "@features/*": ["./src/app/features/*"],
       "@shared/*": ["./src/app/shared/*"],
+      "@layouts/*": ["./src/app/layouts/*"],
         "@core/*": ["./src/app/core/*"],
          "@env/*": ["./src/environments/*"],
           "@assets/*": ["./src/assets/*"],
+          "core/*": ["./src/app/core/*"],
             "@app/*": ["./src/app/*"]
     }
   },

@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 
 import { PaginationComponent } from '@shared/ui/pagination/pagination.component';
 import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
-import type { DemandeStatus } from '@features/private/demande-rv//model/demande-status.type';
+import type { DemandeStatus } from '@features/private/demande-rv/model/demande-status.type';
 
 import { demandeRvService } from '@features/private/demande-rv/service/demande-rv.instance';
 @Component({

@@ -5,15 +5,15 @@ import { RouterLink } from '@angular/router';
 
 import { RdvCardComponent } from '@shared/ui/rdv-card/rdv-card.component';
 
-import type { RendezVous } from './model/rendezvous.model';
-import type { RvStatus } from './model/rv-status.type';
+import type { RendezVous } from '@features/private/mes-rv/model/rendezvous.model';
+import type { RvStatus } from '@features/private/mes-rv/model/rv-status.type';
 
-import { mesRvService } from './service/mes-rv.instance';
+import { mesRvService } from '@features/private/mes-rv/service/mes-rv.instance';
 
 @Component({
   selector: 'app-mes-rv',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink, DatePipe, RdvCardComponent],
+  imports: [NgFor, NgIf, FormsModule, RdvCardComponent],
   templateUrl: './mes-rv.component.html',
   styleUrl: './mes-rv.component.css'
 })
