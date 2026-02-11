@@ -5,7 +5,7 @@ export interface User {
   password: string;
   role: UserRole;
 }
-export type UserRole = 'patient' | 'admin';
+export type UserRole = 'patient' | 'admin' | 'medecin'|'secretaire';
 
 export interface UserRequest{
     email: string;

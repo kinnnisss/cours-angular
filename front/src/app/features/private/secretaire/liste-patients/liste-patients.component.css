@@ -1,0 +1,9 @@
+.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.clickable i {
+  margin-left: .35rem;
+  opacity: .7;
+}

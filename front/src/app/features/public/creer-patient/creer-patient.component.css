@@ -1,0 +1,20 @@
+.form-alert{
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 14px;
+  border: 1px solid transparent;
+}
+
+.form-alert--success{
+  background: #dff3e6;
+  border-color: #bfe6cf;
+  color: #1f6a3a;
+}
+
+.form-alert--error{
+  background: #fde2e1; 
+  border-color: #f5b8b5;
+  color: #8a1f1f;
+}

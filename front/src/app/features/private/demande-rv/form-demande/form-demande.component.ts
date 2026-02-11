@@ -47,7 +47,7 @@ export class FormDemandeComponent {
       specialite: ['', Validators.required],
       dateRV: ['', Validators.required],
       heureRV: ['', Validators.required],
-      motif: [''],
+      motif: ['',[Validators.required,Validators.minLength(5), Validators.maxLength(200)]],
     });
   }
 

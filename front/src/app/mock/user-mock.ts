@@ -22,4 +22,40 @@ export const USERS_MOCK: User[] = [
     password: 'adminpass',
     role: 'admin',
   },
+  {
+    id: '4',
+    nom: 'Dr. House',
+    email: 'house@gmail.com',
+    password: 'housepass',
+    role: 'medecin',
+
+  },
+  {
+    id: '5',
+    nom: 'Secretaire User',
+    email: 'secretaire@gmail.com',
+    password: 'secretairepass',
+    role: 'secretaire',
+  },
+  {
+    id: '6',
+    nom: 'Dr. Strange',
+    email: 'strange@gmail.com',
+    password: 'strangepass',
+    role: 'medecin',
+  },
+  {
+    id: '7',
+    nom: 'Patient Zero',
+    email: 'zero@gmail.com',
+    password: 'zeropass',
+    role: 'patient',
+  },
+  {
+    id: '8',
+    nom: 'Jane Doe',
+    email: 'jd@gmail.com',
+    password: 'jdpass',
+    role: 'patient',
+  }
 ];

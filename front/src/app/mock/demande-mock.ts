@@ -4,7 +4,7 @@ import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.mo
 import type { DemandeStatus } from '@features/private/demande-rv/model/demande-status.type';
 import { SPECIALITES } from '@features/private/demande-rv/model/specialite.type';
 
-export const DEMANDES_MOCK: DemandeRv[] = Array.from({ length: 22 }, (_, i) => {
+export const DEMANDES_MOCK: DemandeRv[] = Array.from({ length: 30 }, (_, i) => {
   const p = USERS_MOCK[i % USERS_MOCK.length];
   const specialite = SPECIALITES[(i + 1) % SPECIALITES.length];
 

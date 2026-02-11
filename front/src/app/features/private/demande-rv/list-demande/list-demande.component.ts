@@ -2,12 +2,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 import { PaginationComponent } from '@shared/ui/pagination/pagination.component';
 import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
 import type { DemandeStatus } from '@features/private/demande-rv/model/demande-status.type';
+import { SecurityService } from '@core/service/security.service';
+import { DemandeRvService } from '@features/private/demande-rv/service/demande-rv.service';
 
-import { demandeRvService } from '@features/private/demande-rv/service/demande-rv.instance';
 @Component({
   selector: 'app-list-demande',
   standalone: true,
@@ -16,17 +18,34 @@ import { demandeRvService } from '@features/private/demande-rv/service/demande-r
   styleUrl: './list-demande.component.css'
 })
 export class ListDemandeComponent implements OnInit, OnDestroy {
-   demandes: DemandeRv[] = [];
-  private loadDemandes():DemandeRv[] {
-    return  [...demandeRvService.getAll()];
-  }
+
+  demandes: DemandeRv[] = [];
+
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(private readonly demandeRvService: DemandeRvService,
+              private readonly securityService: SecurityService
+              
+  ) {}
+
 ngOnInit(): void {
-  this.demandes = this.loadDemandes();
+  const user = this.securityService.getCurrentUser();
+  if (!user?.id) {
+    this.demandes = [];
+    return;
+  }
+
+  this.demandeRvService.getByPatientId(user.id)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((list) => {
+      this.demandes = list;
+    });
 }
-ngOnDestroy(): void {
-  alert('ListDemandeComponent destroyed');
-}
-  
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   filterStatus: '' | DemandeStatus = '';
   filterSpecialite: '' | string = '';

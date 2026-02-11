@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
-import { NgFor, NgIf, DatePipe } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 import { RdvCardComponent } from '@shared/ui/rdv-card/rdv-card.component';
 
 import type { RendezVous } from '@features/private/mes-rv/model/rendezvous.model';
 import type { RvStatus } from '@features/private/mes-rv/model/rv-status.type';
 
-import { mesRvService } from '@features/private/mes-rv/service/mes-rv.instance';
+import { MesRvService } from '@features/private/mes-rv/service/mes-rv.service';
 
 @Component({
   selector: 'app-mes-rv',
@@ -17,13 +17,30 @@ import { mesRvService } from '@features/private/mes-rv/service/mes-rv.instance';
   templateUrl: './mes-rv.component.html',
   styleUrl: './mes-rv.component.css'
 })
-export class MesRvComponent {
+export class MesRvComponent implements OnInit, OnDestroy {
 
-  rdvs: RendezVous[] = mesRvService.getAll();
+  rdvs: RendezVous[] = [];
 
   filterStatus: '' | RvStatus = '';
   filterMonth: '' | string = '';
   filterMedecin = '';
+
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(private readonly mesRvService: MesRvService) {}
+
+  ngOnInit(): void {
+    this.mesRvService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((list) => {
+        this.rdvs = list;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   get months(): { value: string; label: string }[] {
     const set = new Set(this.rdvs.map(r => r.dateIso.slice(0, 7)));
@@ -88,9 +105,11 @@ export class MesRvComponent {
   }
 
   cancelRv(rv: RendezVous): void {
-    mesRvService.cancel(rv.id);
-
-    this.rdvs = mesRvService.getAll();
+    this.mesRvService.cancel(rv.id).subscribe({
+      next: (ok) => {
+        if (!ok) alert('Impossible d’annuler ce rendez-vous.');
+      }
+    });
   }
 
   downloadReport(rv: RendezVous): void {
