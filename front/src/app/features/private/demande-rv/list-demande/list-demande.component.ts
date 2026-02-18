@@ -1,85 +1,108 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, shareReplay ,switchMap,of} from 'rxjs';
 
 import { PaginationComponent } from '@shared/ui/pagination/pagination.component';
 import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
 import type { DemandeStatus } from '@features/private/demande-rv/model/demande-status.type';
 import { SecurityService } from '@core/service/security.service';
 import { DemandeRvService } from '@features/private/demande-rv/service/demande-rv.service';
-
+import { PatientService } from '@core/service/patient.service';
+import type { PatientApi } from '@core/model/patient.model';
 @Component({
   selector: 'app-list-demande',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent, AsyncPipe],
   templateUrl: './list-demande.component.html',
   styleUrl: './list-demande.component.css'
 })
-export class ListDemandeComponent implements OnInit, OnDestroy {
+export class ListDemandeComponent implements OnInit {
 
-  demandes: DemandeRv[] = [];
+  private readonly filterStatusSubject = new BehaviorSubject<'' | DemandeStatus>('');
+  private readonly filterSpecialiteSubject = new BehaviorSubject<string>('');
 
-  private readonly destroy$ = new Subject<void>();
+  readonly filterStatus$ = this.filterStatusSubject.asObservable();
+  readonly filterSpecialite$ = this.filterSpecialiteSubject.asObservable();
 
-  constructor(private readonly demandeRvService: DemandeRvService,
-              private readonly securityService: SecurityService
-              
+  pageSize = 5;
+  private readonly currentPageSubject = new BehaviorSubject<number>(1);
+  readonly currentPage$ = this.currentPageSubject.asObservable();
+
+  readonly demandes$ = new BehaviorSubject<DemandeRv[]>([]);
+
+  readonly specialites$ = this.demandes$.pipe(
+    map(list => Array.from(new Set(list.map(d => d.specialite))).sort()),
+    shareReplay(1)
+  );
+
+  readonly filteredDemandes$ = combineLatest([
+    this.demandes$,
+    this.filterStatus$,
+    this.filterSpecialite$,
+  ]).pipe(
+    map(([list, status, spec]) =>
+      list.filter(d => {
+        const okStatus = !status || d.status === status;
+        const okSpec = !spec || d.specialite === spec;
+        return okStatus && okSpec;
+      })
+    ),
+    shareReplay(1)
+  );
+
+  readonly totalPages$ = this.filteredDemandes$.pipe(
+    map(list => Math.max(1, Math.ceil(list.length / this.pageSize))),
+    shareReplay(1)
+  );
+
+  readonly pagedDemandes$ = combineLatest([
+    this.filteredDemandes$,
+    this.currentPage$
+  ]).pipe(
+    map(([list, page]) => {
+      const start = (page - 1) * this.pageSize;
+      return list.slice(start, start + this.pageSize);
+    }),
+    shareReplay(1)
+  );
+
+  constructor(
+    private readonly demandeRvService: DemandeRvService,
+    private readonly securityService: SecurityService,
+    private readonly patientService: PatientService
   ) {}
 
 ngOnInit(): void {
   const user = this.securityService.getCurrentUser();
   if (!user?.id) {
-    this.demandes = [];
+    this.demandes$.next([]);
     return;
   }
 
-  this.demandeRvService.getByPatientId(user.id)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((list) => {
-      this.demandes = list;
-    });
+this.patientService.getByUserId(user.id).pipe(
+  switchMap((patient: PatientApi | null) => {
+    if (!patient?.id) return of([]);
+    return this.demandeRvService.getByPatientId((patient.id));
+  })
+).subscribe(list => {
+  this.demandes$.next(list);
+  this.currentPageSubject.next(1);
+});
 }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  onStatusChange(v: '' | DemandeStatus) {
+    this.filterStatusSubject.next(v);
+    this.currentPageSubject.next(1);
   }
 
-  filterStatus: '' | DemandeStatus = '';
-  filterSpecialite: '' | string = '';
-
-  pageSize = 5;
-  currentPage = 1;
-
-  get specialites(): string[] {
-    return Array.from(new Set(this.demandes.map(d => d.specialite))).sort();
+  onSpecialiteChange(v: string) {
+    this.filterSpecialiteSubject.next(v);
+    this.currentPageSubject.next(1);
   }
 
-  get filteredDemandes(): DemandeRv[] {
-    return this.demandes.filter(d => {
-      const okStatus = !this.filterStatus || d.status === this.filterStatus;
-      const okSpec = !this.filterSpecialite || d.specialite === this.filterSpecialite;
-      return okStatus && okSpec;
-    });
-  }
-
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.filteredDemandes.length / this.pageSize));
-  }
-
-  get pagedDemandes(): DemandeRv[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    return this.filteredDemandes.slice(start, start + this.pageSize);
-  }
-
-  onFilterChange(): void {
-    this.currentPage = 1;
-  }
-
-  goToPage(p: number): void {
-    this.currentPage = p;
+  goToPage(p: number) {
+    this.currentPageSubject.next(p);
   }
 
   badgeClass(status: DemandeStatus): string {

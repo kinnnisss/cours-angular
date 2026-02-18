@@ -1,0 +1,88 @@
+{
+  "users": [
+    { "id": "USER-001", "nom": "John Doe", "email": "john@example.com", "password": "password123", "role": "patient" },
+    { "id": "USER-002", "nom": "Jane Smith", "email": "jane@example.com", "password": "password456", "role": "patient" },
+    { "id": "USER-003", "nom": "Admin User", "email": "admin@example.com", "password": "adminpass", "role": "admin" },
+    { "id": "USER-004", "nom": "Dr. House", "email": "house@gmail.com", "password": "housepass", "role": "medecin" },
+    { "id": "USER-005", "nom": "Secretaire User", "email": "secretaire@gmail.com", "password": "secretairepass", "role": "secretaire" },
+    { "id": "USER-006", "nom": "Dr. Strange", "email": "strange@gmail.com", "password": "strangepass", "role": "medecin" },
+    { "id": "USER-007", "nom": "Patient Zero", "email": "zero@gmail.com", "password": "zeropass", "role": "patient" },
+    { "id": "USER-008", "nom": "Jane Doe", "email": "jd@gmail.com", "password": "jdpass", "role": "patient" }
+  ],
+
+  "patients": [
+    {
+      "id": 1,
+      "userId": "USER-001",
+      "numero": "P001",
+      "nom": "Doe",
+      "prenom": "John",
+      "tel": "770000001",
+      "adresse": "Dakar, Point E",
+      "antecedents": "Diabetes"
+    },
+    {
+      "id": 2,
+      "userId": "USER-002",
+      "numero": "P002",
+      "nom": "Smith",
+      "prenom": "Jane",
+      "tel": "770000002",
+      "adresse": "Dakar, Sacré-Coeur",
+      "antecedents": ""
+    },
+    {
+      "id": 3,
+      "userId": "USER-007",
+      "numero": "P003",
+      "nom": "Zero",
+      "prenom": "Patient",
+      "tel": "770000007",
+      "adresse": "Dakar, Médina",
+      "antecedents": "Hypertension"
+    },
+    {
+      "id": 4,
+      "userId": "USER-008",
+      "numero": "P004",
+      "nom": "Doe",
+      "prenom": "Jane",
+      "tel": "770000008",
+      "adresse": "Dakar, Liberté 6",
+      "antecedents": ""
+    }
+  ],
+
+  "demandes": [
+    { "id": "DEM-0001", "patientId": 1, "patientNom": "John Doe", "specialite": "Cardiologie", "date": "10/01/2026", "heure": "09:00", "status": "en_attente" },
+    { "id": "DEM-0002", "patientId": 2, "patientNom": "Jane Smith", "specialite": "Dermatologie", "date": "12/01/2026", "heure": "10:30", "status": "accepte" },
+    { "id": "DEM-0003", "patientId": 3, "patientNom": "Patient Zero", "specialite": "Ophtalmologie", "date": "13/01/2026", "heure": "14:00", "status": "refuse" },
+    { "id": "DEM-0004", "patientId": 4, "patientNom": "Jane Doe", "specialite": "Généraliste", "date": "14/01/2026", "heure": "08:30", "status": "en_attente" },
+    { "id": "DEM-0005", "patientId": 1, "patientNom": "John Doe", "specialite": "Dermatologie", "date": "15/01/2026", "heure": "11:35", "status": "accepte" },
+
+    { "id": "DEM-0006", "patientId": 2, "patientNom": "Jane Smith", "specialite": "Cardiologie", "date": "16/01/2026", "heure": "09:30", "status": "refuse" },
+    { "id": "DEM-0007", "patientId": 3, "patientNom": "Patient Zero", "specialite": "Généraliste", "date": "17/01/2026", "heure": "15:30", "status": "en_attente" },
+    { "id": "DEM-0008", "patientId": 4, "patientNom": "Jane Doe", "specialite": "Ophtalmologie", "date": "18/01/2026", "heure": "10:00", "status": "accepte" },
+    { "id": "DEM-0009", "patientId": 1, "patientNom": "John Doe", "specialite": "Cardiologie", "date": "19/01/2026", "heure": "13:00", "status": "refuse" },
+    { "id": "DEM-0010", "patientId": 2, "patientNom": "Jane Smith", "specialite": "Généraliste", "date": "20/01/2026", "heure": "16:00", "status": "en_attente" },
+
+    { "id": "DEM-0011", "patientId": 3, "patientNom": "Patient Zero", "specialite": "Dermatologie", "date": "21/01/2026", "heure": "09:00", "status": "accepte" },
+    { "id": "DEM-0012", "patientId": 4, "patientNom": "Jane Doe", "specialite": "Cardiologie", "date": "22/01/2026", "heure": "10:30", "status": "refuse" },
+    { "id": "DEM-0013", "patientId": 1, "patientNom": "John Doe", "specialite": "Ophtalmologie", "date": "23/01/2026", "heure": "14:30", "status": "en_attente" },
+    { "id": "DEM-0014", "patientId": 2, "patientNom": "Jane Smith", "specialite": "Dermatologie", "date": "24/01/2026", "heure": "12:00", "status": "accepte" },
+    { "id": "DEM-0015", "patientId": 3, "patientNom": "Patient Zero", "specialite": "Généraliste", "date": "25/01/2026", "heure": "08:00", "status": "refuse" },
+
+    { "id": "DEM-0016", "patientId": 4, "patientNom": "Jane Doe", "specialite": "Cardiologie", "date": "26/01/2026", "heure": "11:30", "status": "en_attente" },
+    { "id": "DEM-0017", "patientId": 1, "patientNom": "John Doe", "specialite": "Dermatologie", "date": "27/01/2026", "heure": "09:45", "status": "accepte" },
+    { "id": "DEM-0018", "patientId": 2, "patientNom": "Jane Smith", "specialite": "Ophtalmologie", "date": "28/01/2026", "heure": "13:15", "status": "refuse" },
+    { "id": "DEM-0019", "patientId": 3, "patientNom": "Patient Zero", "specialite": "Cardiologie", "date": "29/01/2026", "heure": "15:00", "status": "en_attente" },
+    { "id": "DEM-0020", "patientId": 4, "patientNom": "Jane Doe", "specialite": "Généraliste", "date": "30/01/2026", "heure": "10:00", "status": "accepte" }
+  ],
+
+  "rdvs": [
+    { "id": "RV-0001", "patientId": 1, "patientNom": "John Doe", "specialite": "Cardiologie", "medecin": "Dr. House", "dateIso": "2026-02-12", "heure": "09:00", "lieu": "Clinique Central", "status": "confirme" },
+    { "id": "RV-0002", "patientId": 2, "patientNom": "Jane Smith", "specialite": "Dermatologie", "medecin": "Dr. Strange", "dateIso": "2026-02-13", "heure": "10:30", "lieu": "Clinique de la Paix", "notes": "Consultation effectuée", "status": "realise" },
+    { "id": "RV-0003", "patientId": 3, "patientNom": "Patient Zero", "specialite": "Ophtalmologie", "medecin": "Dr. House", "dateIso": "2026-02-14", "heure": "14:00", "lieu": "Hôpital Principal", "status": "en_attente" },
+    { "id": "RV-0004", "patientId": 4, "patientNom": "Jane Doe", "specialite": "Généraliste", "medecin": "Dr. Strange", "dateIso": "2026-02-15", "heure": "08:30", "lieu": "Clinique Central", "status": "annule" }
+  ]
+}

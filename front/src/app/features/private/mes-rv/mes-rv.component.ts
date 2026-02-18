@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, combineLatest, map, shareReplay, takeUntil } from 'rxjs';
 
 import { RdvCardComponent } from '@shared/ui/rdv-card/rdv-card.component';
 
@@ -13,28 +13,58 @@ import { MesRvService } from '@features/private/mes-rv/service/mes-rv.service';
 @Component({
   selector: 'app-mes-rv',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RdvCardComponent],
+  imports: [NgFor, NgIf, FormsModule, RdvCardComponent, AsyncPipe],
   templateUrl: './mes-rv.component.html',
   styleUrl: './mes-rv.component.css'
 })
 export class MesRvComponent implements OnInit, OnDestroy {
 
-  rdvs: RendezVous[] = [];
-
-  filterStatus: '' | RvStatus = '';
-  filterMonth: '' | string = '';
-  filterMedecin = '';
-
   private readonly destroy$ = new Subject<void>();
+
+  readonly rdvs$ = new BehaviorSubject<RendezVous[]>([]);
+
+  private readonly filterStatusSubject = new BehaviorSubject<'' | RvStatus>('');
+  private readonly filterMonthSubject = new BehaviorSubject<'' | string>('');
+  private readonly filterMedecinSubject = new BehaviorSubject<string>('');
+
+  readonly filterStatus$ = this.filterStatusSubject.asObservable();
+  readonly filterMonth$ = this.filterMonthSubject.asObservable();
+  readonly filterMedecin$ = this.filterMedecinSubject.asObservable();
+
+  readonly months$ = this.rdvs$.pipe(
+    map(list => {
+      const set = new Set(list.map(r => r.dateIso.slice(0, 7)));
+      const values = Array.from(set).sort();
+      return values.map(v => ({ value: v, label: this.monthLabel(v) }));
+    }),
+    shareReplay(1)
+  );
+
+  readonly filteredRdvs$ = combineLatest([
+    this.rdvs$,
+    this.filterStatus$,
+    this.filterMonth$,
+    this.filterMedecin$,
+  ]).pipe(
+    map(([list, status, month, medecin]) => {
+      const med = medecin.trim().toLowerCase();
+
+      return list.filter(r => {
+        const okStatus = !status || r.status === status;
+        const okMonth = !month || r.dateIso.startsWith(month);
+        const okMed = !med || r.medecin.toLowerCase().includes(med);
+        return okStatus && okMonth && okMed;
+      });
+    }),
+    shareReplay(1)
+  );
 
   constructor(private readonly mesRvService: MesRvService) {}
 
   ngOnInit(): void {
     this.mesRvService.getAll()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((list) => {
-        this.rdvs = list;
-      });
+      .subscribe(list => this.rdvs$.next(list));
   }
 
   ngOnDestroy(): void {
@@ -42,24 +72,16 @@ export class MesRvComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  get months(): { value: string; label: string }[] {
-    const set = new Set(this.rdvs.map(r => r.dateIso.slice(0, 7)));
-    const values = Array.from(set).sort();
-    return values.map(v => ({ value: v, label: this.monthLabel(v) }));
+  onStatusChange(v: '' | RvStatus) {
+    this.filterStatusSubject.next(v);
   }
 
-  get filteredRdvs(): RendezVous[] {
-    const med = this.filterMedecin.trim().toLowerCase();
-
-    return this.rdvs.filter(r => {
-      const okStatus = !this.filterStatus || r.status === this.filterStatus;
-      const okMonth = !this.filterMonth || r.dateIso.startsWith(this.filterMonth);
-      const okMed = !med || r.medecin.toLowerCase().includes(med);
-      return okStatus && okMonth && okMed;
-    });
+  onMonthChange(v: '' | string) {
+    this.filterMonthSubject.next(v);
   }
 
-  onFilterChange(): void {
+  onMedecinChange(v: string) {
+    this.filterMedecinSubject.next(v);
   }
 
   monthLabel(yyyyMm: string): string {
