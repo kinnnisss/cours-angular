@@ -11,10 +11,12 @@ import { SecurityService } from '@core/service/security.service';
 import { DemandeRvService } from '@features/private/demande-rv/service/demande-rv.service';
 import { PatientService } from '@core/service/patient.service';
 import type { PatientApi } from '@core/model/patient.model';
+import { VoirComponent } from '@shared/ui/voir/voir.component';
+
 @Component({
   selector: 'app-list-demande',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent, AsyncPipe],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent, AsyncPipe,VoirComponent],
   templateUrl: './list-demande.component.html',
   styleUrl: './list-demande.component.css'
 })

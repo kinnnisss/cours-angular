@@ -26,9 +26,10 @@ export class DemandeRvService {
     );
   }
 
-  getAll(): Observable<DemandeRv[]> {
-    return this.demandes$;
-  }
+getAll(): Observable<DemandeRv[]> {
+  if (this.demandesSubject.value.length > 0) return this.demandes$;
+  return this.refreshAll().pipe(switchMap(() => this.demandes$));
+}
   getById(id: string): Observable<DemandeRv | null> {
     return this.http.get<DemandeRv>(`${this.API}/demandes/${id}`).pipe(
       catchError(() =>

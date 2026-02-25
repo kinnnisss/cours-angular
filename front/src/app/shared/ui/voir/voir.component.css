@@ -1,0 +1,71 @@
+.voir-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+
+  border-radius: 10px;
+  padding: .45rem .55rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, border-color .12s ease;
+  outline: none;
+  user-select: none;
+}
+
+.voir-btn i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* tailles */
+.voir-btn--sm { padding: .35rem .5rem; border-radius: 10px; }
+.voir-btn--md { padding: .55rem .8rem; border-radius: 12px; }
+
+.voir-btn__text {
+  font-size: .9rem;
+}
+
+/* variantes */
+.voir-btn--outline {
+  color: #334155;
+  border: 1px solid rgba(15, 23, 42, .12);
+  background: rgba(255, 255, 255, .75);
+}
+
+.voir-btn--light {
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, .06);
+  background: rgba(241, 245, 249, .85);
+}
+
+.voir-btn--primary {
+  color: #fff;
+  border: 1px solid rgba(59, 130, 246, .25);
+  background: #2563eb;
+}
+
+/* hover / focus */
+.voir-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .10);
+}
+
+.voir-btn--outline:hover {
+  border-color: rgba(37, 99, 235, .35);
+  background: rgba(37, 99, 235, .06);
+  color: #1d4ed8;
+}
+
+.voir-btn--light:hover {
+  background: rgba(37, 99, 235, .08);
+  color: #1d4ed8;
+}
+
+.voir-btn--primary:hover {
+  background: #1d4ed8;
+}
+
+.voir-btn:focus-visible {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .18);
+}

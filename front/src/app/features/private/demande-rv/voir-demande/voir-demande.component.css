@@ -1,0 +1,73 @@
+.card-soft {
+  border-radius: 16px;
+}
+
+.icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(37, 99, 235, .10);
+  color: #1d4ed8;
+}
+
+.field {
+  padding: .85rem .9rem;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, .03);
+  border: 1px solid rgba(15, 23, 42, .06);
+}
+
+.field__label {
+  font-size: .78rem;
+  color: rgba(15, 23, 42, .55);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: .25rem;
+}
+
+.field__value {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: .4rem .65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, .10);
+  background: rgba(255, 255, 255, .8);
+  font-weight: 600;
+  color: #334155;
+}
+
+.status-box {
+  display: flex;
+  gap: .75rem;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  background: rgba(255, 255, 255, .85);
+}
+
+.status-box__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, .05);
+}
+
+.status-box__title {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.status-box--ok .status-box__icon { background: rgba(16, 185, 129, .12); color: #059669; }
+.status-box--wait .status-box__icon { background: rgba(245, 158, 11, .14); color: #b45309; }
+.status-box--no .status-box__icon { background: rgba(239, 68, 68, .12); color: #dc2626; }

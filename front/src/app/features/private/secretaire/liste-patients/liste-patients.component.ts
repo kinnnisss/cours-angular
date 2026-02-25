@@ -27,7 +27,9 @@ export class ListePatientsComponent {
   private readonly sortDirSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
 
   private readonly currentPageSubject = new BehaviorSubject<number>(1);
-
+  ngOnInit(): void {
+    this.patientService.refreshAll().subscribe();
+  }
   search$ = this.searchSubject.asObservable();
   sortKey$ = this.sortKeySubject.asObservable();
   sortDir$ = this.sortDirSubject.asObservable();

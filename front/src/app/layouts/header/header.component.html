@@ -18,49 +18,19 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
-        <li class="nav-item">
+        <li class="nav-item" *ngFor="let item of navItems()">
           <a
             class="nav-link"
-            [routerLink]="['/private/dashboard']"
+            [routerLink]="item.link"
             routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
           >
-            <i class="bi bi-speedometer2"></i> Tableau de bord
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            [routerLink]="['/private/demandes-rv/new']"
-            routerLinkActive="active"
-          >
-            <i class="bi bi-calendar-event"></i> Demander RV
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            [routerLink]="['/private/demandes-rv']"
-            routerLinkActive="active"
-          >
-            <i class="bi bi-list-check"></i> Mes Demandes
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            [routerLink]="['/private/mes-rv']"
-            routerLinkActive="active"
-          >
-            <i class="bi bi-calendar-check"></i> Mes RV
+            <i [class]="item.icon"></i> {{ item.label }}
           </a>
         </li>
       </ul>
 
-      <div class="d-flex">
+      <div class="d-flex" *ngIf="user() as u">
         <div class="dropdown">
           <button
             class="btn btn-outline-light dropdown-toggle"
@@ -68,25 +38,28 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i class="bi bi-person-circle"></i> {{ userLabel }}
+            <i class="bi bi-person-circle"></i> {{ userLabel() }}
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end">
-            <li>
+            <li *ngIf="role() === 'patient'">
               <a class="dropdown-item" [routerLink]="['/private/mes-informations']">
-                <i class="bi bi-people"></i> Mes Informations
+                <i class="bi bi-person-vcard"></i> Mes informations
               </a>
             </li>
+
             <li>
               <a class="dropdown-item" [routerLink]="['/private/settings']">
                 <i class="bi bi-gear"></i> Paramètres
               </a>
             </li>
+
             <li><hr class="dropdown-divider" /></li>
+
             <li>
-              <a class="dropdown-item" [routerLink]="['/public/login']">
+              <button class="dropdown-item" type="button" (click)="logout()">
                 <i class="bi bi-box-arrow-right"></i> Déconnexion
-              </a>
+              </button>
             </li>
           </ul>
         </div>

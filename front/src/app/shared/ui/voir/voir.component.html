@@ -1,0 +1,16 @@
+<a
+  class="voir-btn"
+  [ngClass]="{
+    'voir-btn--sm': size === 'sm',
+    'voir-btn--md': size === 'md',
+    'voir-btn--primary': variant === 'primary',
+    'voir-btn--light': variant === 'light',
+    'voir-btn--outline': variant === 'outline'
+  }"
+  [routerLink]="link"
+  [attr.title]="title"
+  [attr.aria-label]="title"
+>
+  <i class="bi bi-eye"></i>
+  <span class="voir-btn__text" *ngIf="showText">{{ title }}</span>
+</a>

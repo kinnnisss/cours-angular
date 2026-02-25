@@ -1,0 +1,106 @@
+<div class="container-fluid py-4" *ngIf="(demande$ | async) as d">
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+      <div class="text-muted small mb-1">
+        <a class="text-decoration-none" [routerLink]="['/private/demandes-rv']">Demandes</a>
+        <span class="mx-2">/</span>
+        <span>Détails</span>
+      </div>
+
+      <h1 class="h3 mb-0 d-flex align-items-center gap-2">
+        <span class="icon-circle"><i class="bi bi-eye"></i></span>
+        Demande {{ d.id }}
+      </h1>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <a class="btn btn-outline-secondary" [routerLink]="['/private/demandes-rv']">
+        <i class="bi bi-arrow-left"></i> Retour
+      </a>
+      <span class="badge rounded-pill px-3 py-2" [class]="badgeClass(d.status)">
+        <i class="bi bi-info-circle me-1"></i>{{ badgeLabel(d.status) }}
+      </span>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm card-soft">
+        <div class="card-body">
+          <h2 class="h6 text-uppercase text-muted mb-3">Informations</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="field">
+                <div class="field__label">Spécialité</div>
+                <div class="field__value">{{ d.specialite }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="field">
+                <div class="field__label">Date demandée</div>
+                <div class="field__value">{{ d.date }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="field">
+                <div class="field__label">Heure</div>
+                <div class="field__value">{{ d.heure }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-6" *ngIf="d.patientNom">
+              <div class="field">
+                <div class="field__label">Patient</div>
+                <div class="field__value">{{ d.patientNom }}</div>
+              </div>
+            </div>
+
+            <div class="col-12" *ngIf="d.patientId">
+              <div class="field">
+                <div class="field__label">Identifiant patient</div>
+                <div class="field__value">{{ d.patientId }}</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4" />
+
+          <div class="d-flex flex-wrap gap-2">
+            <span class="chip"><i class="bi bi-hospital me-1"></i> Clinique</span>
+            <span class="chip"><i class="bi bi-calendar-event me-1"></i> {{ d.date }}</span>
+            <span class="chip"><i class="bi bi-clock me-1"></i> {{ d.heure }}</span>
+            <span class="chip"><i class="bi bi-stethoscope me-1"></i> {{ d.specialite }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm card-soft">
+        <div class="card-body">
+          <h2 class="h6 text-uppercase text-muted mb-3">Statut</h2>
+
+          <div class="status-box" [class]="statusBoxClass(d.status)">
+            <div class="status-box__icon">
+              <i [class]="statusIcon(d.status)"></i>
+            </div>
+            <div>
+              <div class="status-box__title">{{ badgeLabel(d.status) }}</div>
+              <div class="status-box__desc text-muted small">
+                {{ statusHelp(d.status) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-muted small">
+            Conseil: si la demande est refusée, tu peux créer une nouvelle demande avec une autre date/heure.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -46,6 +46,7 @@
             <th><i class="bi bi-calendar"></i> Date Demandée</th>
             <th><i class="bi bi-clock"></i> Heure</th>
             <th><i class="bi bi-info-circle"></i> Statut</th>
+            <th class="text-end">Actions</th>
           </tr>
         </thead>
 
@@ -81,6 +82,14 @@
               <span class="badge" [class]="badgeClass(d.status)">
                 <i [class]="badgeIcon(d.status)"></i> {{ badgeLabel(d.status) }}
               </span>
+            </td>
+            <td class="text-end">
+              <app-voir
+                [link]="['/private/demandes-rv', d.id]"
+                title="Voir"
+                variant="outline"
+                size="sm">
+              </app-voir>
             </td>
           </tr>
           <!-- <tr *ngIf="pagedDemandes.length === 0">

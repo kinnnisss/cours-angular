@@ -62,9 +62,9 @@ export class MesRvComponent implements OnInit, OnDestroy {
   constructor(private readonly mesRvService: MesRvService) {}
 
   ngOnInit(): void {
-    this.mesRvService.getAll()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(list => this.rdvs$.next(list));
+  this.mesRvService.refreshAll()
+  .pipe(takeUntil(this.destroy$))
+  .subscribe(list => this.rdvs$.next(list));
   }
 
   ngOnDestroy(): void {
