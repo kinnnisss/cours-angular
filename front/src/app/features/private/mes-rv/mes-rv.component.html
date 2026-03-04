@@ -56,7 +56,7 @@
   <div class="col-lg-4 col-md-6" *ngFor="let rv of ((filteredRdvs$ | async) ?? [])">
     <app-rdv-card
       [rv]="rv"
-      [detailsLinkBase]="'/mes-rv'"
+      [detailsLinkBase]="'/private/mes-rv'"
       (cancel)="cancelRv($event)"
       (report)="downloadReport($event)">
     </app-rdv-card>

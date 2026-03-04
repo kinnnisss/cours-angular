@@ -1,17 +1,20 @@
 // src/app/features/private/private.routes.ts
 import { Routes } from '@angular/router';
 
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { FormDemandeComponent } from './demande-rv/form-demande/form-demande.component';
-import { ListDemandeComponent } from './demande-rv/list-demande/list-demande.component';
-import { MesRvComponent } from './mes-rv/mes-rv.component';
-import { MesInformationsComponent } from './mes-informations/mes-informations.component';
+import { DashboardComponent } from '@features/private/dashboard/dashboard.component';
+import { FormDemandeComponent } from '@features/private/demande-rv/form-demande/form-demande.component';
+import { ListDemandeComponent } from '@features/private/demande-rv/list-demande/list-demande.component';
+import { MesRvComponent } from '@features/private/mes-rv/mes-rv.component';
+import { MesInformationsComponent } from '@features/private/mes-informations/mes-informations.component';
 import { PlaceholderComponent } from '@shared/placeholder/placeholder.component';
-import { ListePatientsComponent } from './secretaire/liste-patients/liste-patients.component';
-
+import { ListePatientsComponent } from '@features/private/secretaire/liste-patients/liste-patients.component';
+import { DossierMedicalComponent } from '@features/private/dossier-medical/dossier-medical.component';
 import { roleGuard } from '@core/guard/role.guard';
-import { VoirDemandeComponent } from './demande-rv/voir-demande/voir-demande.component';
-import { ListDemandesSecretaireComponent } from './secretaire/list-demandes/list-demandes.component';
+import { VoirDemandeComponent } from '@features/private/demande-rv/voir-demande/voir-demande.component';
+import { ListDemandesSecretaireComponent } from '@features/private/secretaire/list-demandes/list-demandes.component';
+import { RdvDetailsComponent } from '@features/private/mes-rv/rdv-details/rdv-details.component';
+import { RdvConsultationComponent } from '@features/private/mes-rv/rdv-consultation/rdv-consultation.component';
+import { RdvOrdonnanceComponent } from '@features/private/mes-rv/rdv-ordonnance/rdv-ordonnance.component';
 
 export const privateRoutes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -23,7 +26,12 @@ export const privateRoutes: Routes = [
 
 
   { path: 'mes-rv', component: MesRvComponent },
+  { path: 'mes-rv/:id', component: RdvDetailsComponent },
+{ path: 'mes-rv/:id/consultation', component: RdvConsultationComponent },
+{ path: 'mes-rv/:id/ordonnance', component: RdvOrdonnanceComponent },
   { path: 'mes-informations', component: MesInformationsComponent },
+  { path: 'mon-dossier', component: DossierMedicalComponent },
+
 
   {
     path: 'secretaire/patients',

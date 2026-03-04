@@ -44,7 +44,7 @@ export class HeaderComponent {
     { label: 'Demander RV', icon: 'bi bi-calendar-event', link: ['/private/demandes-rv/new'], roles: ['patient'] },
     { label: 'Mes Demandes', icon: 'bi bi-list-check', link: ['/private/demandes-rv'], roles: ['patient'] },
     { label: 'Mes RV', icon: 'bi bi-calendar-check', link: ['/private/mes-rv'], roles: ['patient'] },
-
+    { label: 'Voir Mon Dossier médical', icon: 'bi bi-heart-pulse', link: ['/private/mon-dossier'], roles: ['patient'] },
     // Secrétaire
     { label: 'Demandes', icon: 'bi bi-inboxes', link: ['/private/secretaire/demandes'], roles: ['secretaire','admin'] },
     { label: 'Patients', icon: 'bi bi-people', link: ['/private/secretaire/patients'], roles: ['secretaire','admin'] },

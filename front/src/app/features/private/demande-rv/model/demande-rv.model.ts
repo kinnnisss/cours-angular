@@ -9,3 +9,12 @@ export interface DemandeRv {
   heure: string;
   status: DemandeStatus;
 }
+export interface DemandeRvApi {
+  id: string;
+  patientId: string;
+  patientNom: string;
+  specialite: string;
+  date: string;
+  heure: string;
+  status: DemandeStatus;
+}

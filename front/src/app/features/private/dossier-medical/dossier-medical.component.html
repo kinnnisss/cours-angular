@@ -1,0 +1,189 @@
+<div class="container-fluid py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="m-0"><i class="bi bi-heart-pulse"></i> Mon dossier médical</h1>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" [routerLink]="['/private/demandes-rv']">
+        <i class="bi bi-list-check"></i> Mes demandes
+      </a>
+      <a class="btn btn-outline-primary" [routerLink]="['/private/mes-rv']">
+        <i class="bi bi-calendar-check"></i> Mes RV
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="(loading$ | async)" class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <div class="spinner-border" role="status"></div>
+      <div class="mt-3 text-muted">Chargement du dossier...</div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!(loading$ | async) && (error$ | async) as err" class="alert alert-danger" [class.d-none]="!err">
+    <i class="bi bi-exclamation-triangle"></i> {{ err }}
+  </div>
+
+  <ng-container *ngIf="!(loading$ | async) && !(error$ | async)">
+    <div class="row g-4">
+
+      <!-- Identité -->
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-person-badge"></i> Identité</h5>
+
+            <ng-container *ngIf="(patient$ | async) as p">
+              <div class="info-grid">
+                <div class="label">Numéro</div><div class="value">{{ safe(p.numero) }}</div>
+                <div class="label">Nom</div><div class="value">{{ safe(p.nom) }}</div>
+                <div class="label">Prénom</div><div class="value">{{ safe(p.prenom) }}</div>
+                <div class="label">Téléphone</div><div class="value">{{ safe(p.tel) }}</div>
+                <div class="label">Adresse</div><div class="value">{{ safe(p.adresse) }}</div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Résumé + antécédents -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-clipboard2-pulse"></i> Résumé</h5>
+
+            <div class="row g-3" *ngIf="(resume$ | async) as r">
+              <div class="col-md-3">
+                <div class="kpi">
+                  <div class="kpi-value">{{ r.demandesTotal }}</div>
+                  <div class="kpi-label">Demandes</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="kpi">
+                  <div class="kpi-value">{{ r.demandesEnAttente }}</div>
+                  <div class="kpi-label">En attente</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="kpi">
+                  <div class="kpi-value">{{ r.rdvsTotal }}</div>
+                  <div class="kpi-label">Rendez-vous</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="kpi">
+                  <div class="kpi-value">{{ r.rdvsAVenir }}</div>
+                  <div class="kpi-label">À venir</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-file-medical"></i> Antécédents</h5>
+
+            <ng-container *ngIf="(patient$ | async) as p">
+              <div class="text-muted" *ngIf="!p.antecedents">Aucun antécédent renseigné.</div>
+              <div class="antecedents" *ngIf="p.antecedents">{{ p.antecedents }}</div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dernières demandes -->
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title m-0"><i class="bi bi-list-check"></i> Dernières demandes</h5>
+              <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/private/demandes-rv']">Voir tout</a>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Spécialité</th>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let d of ((demandes$ | async) ?? []).slice(0, 6)">
+                    <td>{{ d.specialite }}</td>
+                    <td>{{ d.date }}</td>
+                    <td>{{ d.heure }}</td>
+                    <td>
+                      <span class="badge" [class]="badgeClassDemande(d.status)">
+                        {{ d.status }}
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="(((demandes$ | async) ?? []).length === 0)">
+                    <td colspan="4" class="text-center text-muted py-3">Aucune demande.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Derniers RDV -->
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title m-0"><i class="bi bi-calendar-check"></i> Derniers rendez-vous</h5>
+              <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/private/mes-rv']">Voir tout</a>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Spécialité</th>
+                    <th>Médecin</th>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Lieu</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let r of ((rdvs$ | async) ?? []).slice(0, 6)">
+                    <td>{{ r.specialite }}</td>
+                    <td>{{ r.medecin }}</td>
+                    <td>{{ r.dateIso | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ r.heure }}</td>
+                    <td>{{ r.lieu }}</td>
+                    <td>
+                      <span class="badge" [class]="badgeClassRdv(r.status)">
+                        {{ r.status }}
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="(((rdvs$ | async) ?? []).length === 0)">
+                    <td colspan="6" class="text-center text-muted py-3">Aucun rendez-vous.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+</div>

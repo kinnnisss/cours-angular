@@ -12,3 +12,15 @@ export interface RendezVous {
   notes?: string;
   status: RvStatus;
 }
+export interface RendezVousApi {
+  id: string;
+  patientId: number;
+  patientNom: string;
+  specialite: string;
+  medecin: string;
+  dateIso: string;
+  heure: string;
+  lieu: string;
+  notes?: string;
+  status: RvStatus;
+}

@@ -9,11 +9,12 @@ import type { RendezVous } from '@features/private/mes-rv/model/rendezvous.model
 import type { RvStatus } from '@features/private/mes-rv/model/rv-status.type';
 
 import { MesRvService } from '@features/private/mes-rv/service/mes-rv.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-mes-rv',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RdvCardComponent, AsyncPipe],
+  imports: [NgFor, NgIf, FormsModule, RdvCardComponent, AsyncPipe,RouterLink],
   templateUrl: './mes-rv.component.html',
   styleUrl: './mes-rv.component.css'
 })

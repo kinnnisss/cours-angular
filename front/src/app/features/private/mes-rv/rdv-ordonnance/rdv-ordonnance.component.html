@@ -1,0 +1,42 @@
+<div class="container-fluid py-4" *ngIf="(rdv$ | async) as rv; else nf">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="m-0"><i class="bi bi-file-earmark-medical"></i> Ordonnance</h1>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" [routerLink]="['/private/mes-rv', rv.id]">
+        <i class="bi bi-arrow-left"></i> Détails
+      </a>
+      <a class="btn btn-outline-primary" [routerLink]="['/private/mes-rv', rv.id, 'consultation']">
+        <i class="bi bi-clipboard2-pulse"></i> Consultation
+      </a>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div>
+          <div class="text-muted">RV : <strong>{{ rv.id }}</strong></div>
+          <div class="mt-2"><app-status-badge [status]="rv.status"></app-status-badge></div>
+        </div>
+        <div class="text-end">
+          <div><strong>{{ rv.specialite }}</strong></div>
+          <div class="text-muted">{{ rv.medecin }}</div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="alert alert-light border mb-0">
+        <i class="bi bi-info-circle"></i>
+        Aucune ordonnance enregistrée pour ce rendez-vous.
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #nf>
+  <div class="container-fluid py-4">
+    <div class="alert alert-warning border">Ordonnance introuvable.</div>
+  </div>
+</ng-template>
