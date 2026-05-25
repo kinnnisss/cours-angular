@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { map, switchMap, of, catchError } from 'rxjs';
 
 import { MesRvService } from '@features/private/mes-rv/service/mes-rv.service';
@@ -12,7 +12,7 @@ import { KeyValueComponent } from '@shared/ui/key-value/key-value.component';
 @Component({
   selector: 'app-rdv-details',
   standalone: true,
-  imports: [NgIf, AsyncPipe, RouterLink, DatePipe, StatusBadgeComponent, KeyValueComponent],
+  imports: [NgIf, AsyncPipe, RouterLink, StatusBadgeComponent, KeyValueComponent],
   templateUrl: './rdv-details.component.html',
 })
 export class RdvDetailsComponent {

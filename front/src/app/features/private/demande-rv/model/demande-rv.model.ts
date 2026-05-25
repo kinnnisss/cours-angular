@@ -1,20 +1,15 @@
 import type { DemandeStatus } from './demande-status.type';
 
 export interface DemandeRv {
-  id: string;
-  patientId: string;
+  id: number | string;
+  patientId: number | string;
   patientNom: string;
   specialite: string;
   date: string;
   heure: string;
   status: DemandeStatus;
+  motif?: string;
+  remarques?: string;
 }
-export interface DemandeRvApi {
-  id: string;
-  patientId: string;
-  patientNom: string;
-  specialite: string;
-  date: string;
-  heure: string;
-  status: DemandeStatus;
-}
+
+export type DemandeRvApi = DemandeRv;

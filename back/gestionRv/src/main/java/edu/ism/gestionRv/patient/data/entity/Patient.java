@@ -1,19 +1,26 @@
 package edu.ism.gestionRv.patient.data.entity;
 
+import edu.ism.gestionRv.demande.data.entity.Demande;
+import edu.ism.gestionRv.rendezvous.data.entity.RendezVous;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "patients")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Patient {
@@ -21,21 +28,27 @@ public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true,updatable = false)
-    private String userId; // Utiliser l'ID généré comme userId
+
+    @Column(unique = true)
+    private String userId;
+
     private String numero;
     private String nom;
     private String prenom;
+
     @Column(unique = true)
     private String tel;
+
     private String adresse;
-    @Column(nullable = true, columnDefinition = "TEXT")
+
+    @Column(columnDefinition = "TEXT")
     private String antecedents;
 
-    @PrePersist
-    public void prePersist() {
-        if (this.userId == null || this.userId.isEmpty()) {
-            this.userId = "USER-00" + this.id;
-        }
-    }
+    @Builder.Default
+    @OneToMany(mappedBy = "patient")
+    private List<Demande> demandes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "patient")
+    private List<RendezVous> rendezVous = new ArrayList<>();
 }

@@ -1,115 +1,147 @@
 package edu.ism.gestionRv.client.web;
 
+import edu.ism.gestionRv.client.web.dto.ApiResponseDto;
+import edu.ism.gestionRv.client.web.dto.DemandeCreateRequestDto;
+import edu.ism.gestionRv.client.web.dto.DemandeResponseDto;
+import edu.ism.gestionRv.client.web.dto.DemandeStatusUpdateRequestDto;
+import edu.ism.gestionRv.client.web.dto.PageResponseDto;
 import edu.ism.gestionRv.demande.data.entity.Demande;
 import edu.ism.gestionRv.demande.service.DemandeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/demandes")
+@RequestMapping("/api/v1/demandes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class DemandeControllerWeb {
 
     private final DemandeService demandeService;
 
     @PostMapping
-    public ResponseEntity<Demande> createDemande(
-            @RequestParam Long patientId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateConsultation,
-            @RequestParam(required = false) String motif,
-            @RequestParam(required = false) String remarques) {
-        try {
-            Demande demande = demandeService.createDemande(patientId, dateConsultation, motif, remarques);
-            return ResponseEntity.status(HttpStatus.CREATED).body(demande);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ApiResponseDto<DemandeResponseDto>> createDemande(
+            @Valid @RequestBody DemandeCreateRequestDto request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseDto.success(
+                        "Demande creee avec succes",
+                        demandeService.createDemande(request)
+                ));
     }
 
     @GetMapping("/du-jour")
-    public ResponseEntity<List<Demande>> getDemandesDuJour() {
-        List<Demande> demandes = demandeService.getDemandesDuJour();
-        return ResponseEntity.ok(demandes);
+    public ResponseEntity<ApiResponseDto<List<DemandeResponseDto>>> getDemandesDuJour() {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demandes du jour recuperees avec succes",
+                demandeService.getDemandesDuJour()
+        ));
     }
 
     @GetMapping("/du-jour/patient/{patientId}")
-    public ResponseEntity<List<Demande>> getDemandesDuJourByPatient(@PathVariable Long patientId) {
-        List<Demande> demandes = demandeService.getDemandesDuJourByPatient(patientId);
-        return ResponseEntity.ok(demandes);
+    public ResponseEntity<ApiResponseDto<List<DemandeResponseDto>>> getDemandesDuJourByPatient(@PathVariable Long patientId) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demandes du jour du patient recuperees avec succes",
+                demandeService.getDemandesDuJourByPatient(patientId)
+        ));
     }
 
     @GetMapping
-    public ResponseEntity<List<Demande>> getAllDemandes() {
-        List<Demande> demandes = demandeService.getAllDemandes();
-        return ResponseEntity.ok(demandes);
+    public ResponseEntity<ApiResponseDto<PageResponseDto<DemandeResponseDto>>> getDemandes(
+            @RequestParam(required = false) Long patientId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String specialite,
+            @RequestParam(required = false) String patientQuery,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "5") int size) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demandes recuperees avec succes",
+                demandeService.getDemandes(patientId, date, status, specialite, patientQuery, page, size)
+        ));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<Demande>> getDemandesWithFilter(
+    public ResponseEntity<ApiResponseDto<PageResponseDto<DemandeResponseDto>>> getDemandesWithFilter(
             @RequestParam(required = false) Long patientId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<Demande> demandes = demandeService.getDemandesWithFilter(patientId, date);
-        return ResponseEntity.ok(demandes);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String specialite,
+            @RequestParam(required = false) String patientQuery,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "5") int size) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demandes filtrees recuperees avec succes",
+                demandeService.getDemandes(patientId, date, status, specialite, patientQuery, page, size)
+        ));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Demande> getDemandeById(@PathVariable Long id) {
-        Optional<Demande> demande = demandeService.getDemandeById(id);
-        return demande.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponseDto<DemandeResponseDto>> getDemandeById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demande recuperee avec succes",
+                demandeService.getDemandeById(id)
+        ));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<DemandeResponseDto>> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody DemandeStatusUpdateRequestDto payload) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Statut de la demande mis a jour avec succes",
+                demandeService.updateStatus(id, payload.status())
+        ));
     }
 
     @PutMapping("/{id}/valider")
-    public ResponseEntity<Demande> validerDemande(@PathVariable Long id) {
-        try {
-            Demande demande = demandeService.validerDemande(id);
-            return ResponseEntity.ok(demande);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ApiResponseDto<DemandeResponseDto>> validerDemande(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demande validee avec succes",
+                demandeService.validerDemande(id)
+        ));
     }
 
     @PutMapping("/{id}/annuler")
-    public ResponseEntity<Demande> annulerDemande(@PathVariable Long id) {
-        try {
-            Demande demande = demandeService.annulerDemande(id);
-            return ResponseEntity.ok(demande);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ApiResponseDto<DemandeResponseDto>> annulerDemande(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demande annulee avec succes",
+                demandeService.annulerDemande(id)
+        ));
     }
 
     @PutMapping("/{id}/completer")
-    public ResponseEntity<Demande> completarDemande(@PathVariable Long id) {
-        try {
-            Demande demande = demandeService.completarDemande(id);
-            return ResponseEntity.ok(demande);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ApiResponseDto<DemandeResponseDto>> completarDemande(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demande completee avec succes",
+                demandeService.completarDemande(id)
+        ));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDemande(@PathVariable Long id) {
-        try {
-            demandeService.deleteDemande(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ApiResponseDto<Void>> deleteDemande(@PathVariable Long id) {
+        demandeService.deleteDemande(id);
+        return ResponseEntity.ok(ApiResponseDto.success("Demande supprimee avec succes", null));
     }
 
     @GetMapping("/statut/{statut}")
-    public ResponseEntity<List<Demande>> getDemandesByStatut(@PathVariable Demande.StatutDemande statut) {
-        List<Demande> demandes = demandeService.getDemandesByStatut(statut);
-        return ResponseEntity.ok(demandes);
+    public ResponseEntity<ApiResponseDto<List<DemandeResponseDto>>> getDemandesByStatut(@PathVariable Demande.StatutDemande statut) {
+        return ResponseEntity.ok(ApiResponseDto.success(
+                "Demandes par statut recuperees avec succes",
+                demandeService.getDemandesByStatut(statut)
+        ));
     }
 }

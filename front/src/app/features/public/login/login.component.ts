@@ -57,7 +57,8 @@ export class LoginComponent {
     const payload = this.form.value as { email: string; password: string };
 
     this.securityService.login(payload).subscribe({
-      next: () => {
+      next: (response) => {
+        this.securityService.persistSession(response);
         this.loading = false;
         this.redirectByRole();
       },

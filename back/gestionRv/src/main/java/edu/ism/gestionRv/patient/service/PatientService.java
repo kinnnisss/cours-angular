@@ -1,17 +1,16 @@
 package edu.ism.gestionRv.patient.service;
 
+import edu.ism.gestionRv.client.web.dto.PageResponseDto;
 import edu.ism.gestionRv.client.web.dto.PatientCreateRequestDto;
 import edu.ism.gestionRv.client.web.dto.PatientCreateResponseDto;
-import java.util.List;
-import java.util.Optional;
 
 public interface PatientService {
 
     PatientCreateResponseDto createPatient(PatientCreateRequestDto request);
 
-    List<PatientCreateResponseDto> getAllPatients();
+    PageResponseDto<PatientCreateResponseDto> getPatients(String userId, String search, int page, int size, String sortBy, String sortDir);
 
-    Optional<PatientCreateResponseDto> getPatientById(Long id);
+    PatientCreateResponseDto getPatientById(Long id);
 
     void deletePatient(Long id);
 }

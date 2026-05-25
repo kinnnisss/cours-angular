@@ -6,7 +6,6 @@ import edu.ism.gestionRv.demande.data.entity.Demande;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @UtilityClass
 public class DemandeMapper {
@@ -15,13 +14,15 @@ public class DemandeMapper {
         if (demande == null) {
             return null;
         }
+
         return new DemandeResponseDto(
                 demande.getId(),
                 demande.getPatient().getId(),
-                demande.getPatient().getNom(),
-                demande.getPatient().getPrenom(),
+                demande.getPatient().getPrenom() + " " + demande.getPatient().getNom(),
+                demande.getSpecialite(),
                 demande.getDateConsultation(),
-                demande.getStatut().name(),
+                demande.getHeureConsultation(),
+                toApiStatus(demande.getStatut()),
                 demande.getMotif(),
                 demande.getRemarques(),
                 demande.getDateCreation(),
@@ -32,17 +33,28 @@ public class DemandeMapper {
     public static List<DemandeResponseDto> toResponseDtoList(List<Demande> demandes) {
         return demandes.stream()
                 .map(DemandeMapper::toResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static Demande toDemande(DemandeCreateRequestDto dto) {
         if (dto == null) {
             return null;
         }
-        Demande demande = new Demande();
-        demande.setDateConsultation(dto.getDateConsultation());
-        demande.setMotif(dto.getMotif());
-        demande.setRemarques(dto.getRemarques());
-        return demande;
+
+        return Demande.builder()
+                .specialite(dto.specialite())
+                .dateConsultation(dto.date())
+                .heureConsultation(dto.heure())
+                .motif(dto.motif())
+                .remarques(dto.remarques())
+                .build();
+    }
+
+    public static String toApiStatus(Demande.StatutDemande statutDemande) {
+        return switch (statutDemande) {
+            case CREEE -> "en_attente";
+            case VALIDEE, COMPLETEE -> "accepte";
+            case ANNULEE -> "refuse";
+        };
     }
 }

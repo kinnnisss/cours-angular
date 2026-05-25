@@ -1,41 +1,51 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { Observable, map, throwError, catchError } from 'rxjs';
 
-import type { PatientRequest, PatientModel ,PatientApi} from '@core/model/patient.model';
+import type { PatientRequest, PatientApi } from '@core/model/patient.model';
+import type { ApiResponse, PageResponse } from '@core/model/api-response.model';
+import { API_BASE_URL } from '@core/config/api.config';
+
+export interface PatientPageQuery {
+  userId?: string;
+  search?: string;
+  page?: number;
+  size?: number;
+  sortBy?: 'numero' | 'nom' | 'prenom' | 'tel';
+  sortDir?: 'asc' | 'desc';
+}
 
 @Injectable({ providedIn: 'root' })
 export class PatientService {
-  private readonly API = 'http://localhost:3001';
-  private readonly patientsSubject = new BehaviorSubject<PatientModel[]>([]);
-  readonly patients$ = this.patientsSubject.asObservable();
+  private readonly API = `${API_BASE_URL}/patients`;
+
   constructor(private readonly http: HttpClient) {}
-  refreshAll(): Observable<PatientModel[]> {
-    return this.http.get<PatientModel[]>(`${this.API}/patients`).pipe(
-      tap(list => this.patientsSubject.next(list)),
-      catchError(() => {
-        this.patientsSubject.next([]);
-        return of([]);
-      })
+
+  getPage(query: PatientPageQuery = {}): Observable<PageResponse<PatientApi>> {
+    const params: Record<string, string | number> = {
+      page: query.page ?? 0,
+      size: query.size ?? 5,
+      sortBy: query.sortBy ?? 'nom',
+      sortDir: query.sortDir ?? 'asc',
+    };
+
+    if (query.search?.trim()) params['search'] = query.search.trim();
+    if (query.userId?.trim()) params['userId'] = query.userId.trim();
+
+    return this.http.get<ApiResponse<PageResponse<PatientApi>>>(this.API, { params }).pipe(
+      map(response => response.data)
     );
   }
 
-  getAll(): Observable<PatientModel[]> {
-    return this.patients$;
-  }
-  getById(id: number): Observable<PatientModel | null> {
-    return this.http.get<PatientModel>(`${this.API}/patients/${id}`).pipe(
-      catchError(() =>
-        this.patients$.pipe(
-          map(list => list.find(p => p.id === id) ?? null)
-        )
-      )
+  getById(id: number): Observable<PatientApi> {
+    return this.http.get<ApiResponse<PatientApi>>(`${this.API}/${id}`).pipe(
+      map(response => response.data)
     );
   }
-  createPatient(patientData: PatientRequest): Observable<PatientModel> {
+
+  createPatient(patientData: PatientRequest): Observable<PatientApi> {
     if (!patientData.nom?.trim() || !patientData.prenom?.trim()) {
-      return throwError(() => new Error('Données patient invalides'));
+      return throwError(() => new Error('Donnees patient invalides'));
     }
 
     const payload = {
@@ -44,26 +54,18 @@ export class PatientService {
       prenom: patientData.prenom.trim(),
     };
 
-    return this.http.post<PatientModel>(`${this.API}/patients`, payload).pipe(
-      tap(created => {
-        const current = this.patientsSubject.value;
-        this.patientsSubject.next([created, ...current]);
-      }),
-      catchError((err) => {
-        const msg = err?.message || 'Impossible de créer le patient';
-        return throwError(() => new Error(msg));
+    return this.http.post<ApiResponse<PatientApi>>(this.API, payload).pipe(
+      map(response => response.data),
+      catchError((error) => {
+        const message = error?.error?.errors?.[0] ?? 'Impossible de creer le patient';
+        return throwError(() => new Error(message));
       })
     );
   }
-getByUserId(userId: string): Observable<PatientApi | null> {
-  return this.http
-    .get<PatientApi[]>(`${this.API}/patients`, { params: { userId } })
-    .pipe(
-      map((list) => list[0] ?? null),
-      catchError(() => of(null))
+
+  getByUserId(userId: string): Observable<PatientApi | null> {
+    return this.getPage({ userId, page: 0, size: 1 }).pipe(
+      map(page => page.items[0] ?? null)
     );
-}
-
-
-
+  }
 }

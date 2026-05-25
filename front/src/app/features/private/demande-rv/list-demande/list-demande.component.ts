@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, shareReplay ,switchMap,of} from 'rxjs';
+import { BehaviorSubject, combineLatest, map, of, shareReplay, switchMap } from 'rxjs';
 
 import { PaginationComponent } from '@shared/ui/pagination/pagination.component';
 import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
@@ -16,57 +16,84 @@ import { VoirComponent } from '@shared/ui/voir/voir.component';
 @Component({
   selector: 'app-list-demande',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent, AsyncPipe,VoirComponent],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, PaginationComponent, AsyncPipe, VoirComponent],
   templateUrl: './list-demande.component.html',
   styleUrl: './list-demande.component.css'
 })
 export class ListDemandeComponent implements OnInit {
-
   private readonly filterStatusSubject = new BehaviorSubject<'' | DemandeStatus>('');
   private readonly filterSpecialiteSubject = new BehaviorSubject<string>('');
+  private readonly patientIdSubject = new BehaviorSubject<number | null>(null);
+  private readonly currentPageSubject = new BehaviorSubject<number>(1);
 
   readonly filterStatus$ = this.filterStatusSubject.asObservable();
   readonly filterSpecialite$ = this.filterSpecialiteSubject.asObservable();
-
-  pageSize = 5;
-  private readonly currentPageSubject = new BehaviorSubject<number>(1);
+  readonly patientId$ = this.patientIdSubject.asObservable();
   readonly currentPage$ = this.currentPageSubject.asObservable();
 
-  readonly demandes$ = new BehaviorSubject<DemandeRv[]>([]);
+  readonly pageSize = 5;
 
-  readonly specialites$ = this.demandes$.pipe(
-    map(list => Array.from(new Set(list.map(d => d.specialite))).sort()),
-    shareReplay(1)
-  );
-
-  readonly filteredDemandes$ = combineLatest([
-    this.demandes$,
+  readonly pageData$ = combineLatest([
+    this.patientId$,
     this.filterStatus$,
     this.filterSpecialite$,
+    this.currentPage$,
   ]).pipe(
-    map(([list, status, spec]) =>
-      list.filter(d => {
-        const okStatus = !status || d.status === status;
-        const okSpec = !spec || d.specialite === spec;
-        return okStatus && okSpec;
-      })
-    ),
-    shareReplay(1)
-  );
+    switchMap(([patientId, status, specialite, page]) => {
+      if (!patientId) {
+        return of({
+          items: [] as DemandeRv[],
+          page: 0,
+          size: this.pageSize,
+          totalElements: 0,
+          totalPages: 0,
+          first: true,
+          last: true,
+        });
+      }
 
-  readonly totalPages$ = this.filteredDemandes$.pipe(
-    map(list => Math.max(1, Math.ceil(list.length / this.pageSize))),
-    shareReplay(1)
-  );
-
-  readonly pagedDemandes$ = combineLatest([
-    this.filteredDemandes$,
-    this.currentPage$
-  ]).pipe(
-    map(([list, page]) => {
-      const start = (page - 1) * this.pageSize;
-      return list.slice(start, start + this.pageSize);
+      return this.demandeRvService.getPage({
+        patientId,
+        status,
+        specialite,
+        page: page - 1,
+        size: this.pageSize,
+      });
     }),
+    shareReplay(1)
+  );
+
+  readonly pagedDemandes$ = this.pageData$.pipe(
+    map(page => page.items),
+    shareReplay(1)
+  );
+
+  readonly specialites$ = this.patientId$.pipe(
+    switchMap(patientId => {
+      if (!patientId) {
+        return of({
+          items: [] as DemandeRv[],
+          page: 0,
+          size: 100,
+          totalElements: 0,
+          totalPages: 0,
+          first: true,
+          last: true,
+        });
+      }
+
+      return this.demandeRvService.getPage({
+        patientId,
+        page: 0,
+        size: 100,
+      });
+    }),
+    map(page => Array.from(new Set(page.items.map(d => d.specialite))).sort()),
+    shareReplay(1)
+  );
+
+  readonly totalPages$ = this.pageData$.pipe(
+    map(page => Math.max(1, page.totalPages)),
     shareReplay(1)
   );
 
@@ -76,34 +103,30 @@ export class ListDemandeComponent implements OnInit {
     private readonly patientService: PatientService
   ) {}
 
-ngOnInit(): void {
-  const user = this.securityService.getCurrentUser();
-  if (!user?.id) {
-    this.demandes$.next([]);
-    return;
+  ngOnInit(): void {
+    const user = this.securityService.getCurrentUser();
+    if (!user?.id) {
+      this.patientIdSubject.next(null);
+      return;
+    }
+
+    this.patientService.getByUserId(user.id).subscribe((patient: PatientApi | null) => {
+      this.patientIdSubject.next(patient?.id ?? null);
+      this.currentPageSubject.next(1);
+    });
   }
 
-this.patientService.getByUserId(user.id).pipe(
-  switchMap((patient: PatientApi | null) => {
-    if (!patient?.id) return of([]);
-    return this.demandeRvService.getByPatientId((patient.id));
-  })
-).subscribe(list => {
-  this.demandes$.next(list);
-  this.currentPageSubject.next(1);
-});
-}
-  onStatusChange(v: '' | DemandeStatus) {
+  onStatusChange(v: '' | DemandeStatus): void {
     this.filterStatusSubject.next(v);
     this.currentPageSubject.next(1);
   }
 
-  onSpecialiteChange(v: string) {
+  onSpecialiteChange(v: string): void {
     this.filterSpecialiteSubject.next(v);
     this.currentPageSubject.next(1);
   }
 
-  goToPage(p: number) {
+  goToPage(p: number): void {
     this.currentPageSubject.next(p);
   }
 
@@ -126,8 +149,8 @@ this.patientService.getByUserId(user.id).pipe(
   badgeLabel(status: DemandeStatus): string {
     switch (status) {
       case 'en_attente': return 'En attente';
-      case 'accepte': return 'Acceptée';
-      case 'refuse': return 'Refusée';
+      case 'accepte': return 'Acceptee';
+      case 'refuse': return 'Refusee';
     }
   }
 }

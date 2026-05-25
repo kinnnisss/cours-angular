@@ -5,25 +5,23 @@
 
       <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-
           <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
             <div class="mb-3">
               <label class="form-label">
-                <i class="bi bi-stethoscope"></i> Spécialité
+                <i class="bi bi-stethoscope"></i> Specialite
               </label>
 
               <select class="form-select"
                       formControlName="specialite"
                       [class.is-invalid]="isInvalid('specialite')">
-                <option value="">-- Sélectionnez une spécialité --</option>
+                <option value="">-- Selectionnez une specialite --</option>
                 <option *ngFor="let s of specialites" [value]="s.value">
                   {{ s.label }}
                 </option>
               </select>
 
               <div class="invalid-feedback" *ngIf="isInvalid('specialite')">
-                Veuillez sélectionner une spécialité.
+                Veuillez selectionner une specialite.
               </div>
             </div>
 
@@ -61,38 +59,41 @@
 
             <div class="mb-3">
               <label class="form-label">
-                <i class="bi bi-file-text"></i> Motif de la Consultation
+                <i class="bi bi-file-text"></i> Motif de la consultation
               </label>
 
               <textarea class="form-control"
                         rows="3"
                         formControlName="motif"
-                        placeholder="Décrivez le motif de votre consultation..."></textarea>
+                        placeholder="Decrivez le motif de votre consultation..."></textarea>
             </div>
 
             <div class="alert alert-info" role="alert">
               <i class="bi bi-info-circle"></i>
-              <strong>Statut:</strong> Votre demande sera enregistrée avec le statut
-              <strong>"En attente"</strong> et examinée par le médecin.
+              <strong>Statut:</strong> votre demande sera enregistree avec le statut
+              <strong>"En attente"</strong> et examinee par l equipe.
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-              <a [routerLink]="'/dashboard'" class="btn btn-secondary">
+              <a [routerLink]="'/private/demandes-rv'" class="btn btn-secondary">
                 <i class="bi bi-x-circle"></i> Annuler
               </a>
 
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" [disabled]="loading">
                 <i class="bi bi-check-circle"></i> Soumettre la Demande
               </button>
             </div>
 
-            <div class="alert alert-success mt-3" *ngIf="submitted && form.valid">
+            <div class="alert alert-success mt-3" *ngIf="successMsg">
               <i class="bi bi-check-circle"></i>
-              Demande envoyée (mock). Voir la console pour les données.
+              {{ successMsg }}
             </div>
 
+            <div class="alert alert-danger mt-3" *ngIf="errorMsg">
+              <i class="bi bi-exclamation-triangle"></i>
+              {{ errorMsg }}
+            </div>
           </form>
-
         </div>
       </div>
     </div>
@@ -102,18 +103,17 @@
         <div class="card-body">
           <h5 class="card-title"><i class="bi bi-lightbulb"></i> Aide</h5>
           <p class="card-text small text-muted">
-            Remplissez le formulaire ci-contre pour demander un rendez-vous auprès d'un spécialiste.
+            Remplissez le formulaire ci-contre pour demander un rendez-vous aupres d un specialiste.
           </p>
           <hr>
           <h6 class="card-subtitle mb-2">Comment cela fonctionne:</h6>
           <ol class="list-unstyled small">
-            <li><i class="bi bi-circle-fill text-primary"></i> <strong>1.</strong> Choisissez la spécialité</li>
-            <li><i class="bi bi-circle-fill text-primary"></i> <strong>2.</strong> Définissez la date et heure</li>
+            <li><i class="bi bi-circle-fill text-primary"></i> <strong>1.</strong> Choisissez la specialite</li>
+            <li><i class="bi bi-circle-fill text-primary"></i> <strong>2.</strong> Definissez la date et l heure</li>
             <li><i class="bi bi-circle-fill text-primary"></i> <strong>3.</strong> Attendez la confirmation</li>
           </ol>
         </div>
       </div>
     </div>
-
   </div>
 </div>

@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, combineLatest } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import type { PatientApi } from '@core/model/patient.model';
+import type { ApiResponse, PageResponse } from '@core/model/api-response.model';
 import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
-import type { RendezVousApi} from '@features/private/mes-rv/model/rendezvous.model';
+import type { RendezVousApi } from '@features/private/mes-rv/model/rendezvous.model';
+import { API_BASE_URL } from '@core/config/api.config';
 
 export interface DossierMedical {
   patient: PatientApi;
@@ -15,7 +17,7 @@ export interface DossierMedical {
 
 @Injectable({ providedIn: 'root' })
 export class DossierMedicalService {
-  private readonly API = 'http://localhost:3001';
+  private readonly API = API_BASE_URL;
 
   private readonly patientSubject = new BehaviorSubject<PatientApi | null>(null);
   readonly patient$ = this.patientSubject.asObservable();
@@ -27,9 +29,12 @@ export class DossierMedicalService {
   readonly rdvs$ = this.rdvsSubject.asObservable();
 
   constructor(private readonly http: HttpClient) {}
+
   refreshPatientByUserId(userId: string): Observable<PatientApi | null> {
-    return this.http.get<PatientApi[]>(`${this.API}/patients`, { params: { userId } }).pipe(
-      map(list => list?.[0] ?? null),
+    return this.http.get<ApiResponse<PageResponse<PatientApi>>>(`${this.API}/patients`, {
+      params: { userId, page: 0, size: 1 },
+    }).pipe(
+      map(response => response.data.items?.[0] ?? null),
       tap(patient => this.patientSubject.next(patient)),
       catchError(() => {
         this.patientSubject.next(null);
@@ -43,9 +48,13 @@ export class DossierMedicalService {
     if (cached?.userId === userId) return this.patient$;
     return this.refreshPatientByUserId(userId).pipe(switchMap(() => this.patient$));
   }
+
   refreshDemandesByPatientId(patientId: number): Observable<DemandeRv[]> {
-    return this.http.get<DemandeRv[]>(`${this.API}/demandes`, { params: { patientId } as any }).pipe(
-      tap(list => this.demandesSubject.next(list ?? [])),
+    return this.http.get<ApiResponse<PageResponse<DemandeRv>>>(`${this.API}/demandes`, {
+      params: { patientId, page: 0, size: 20 } as Record<string, string | number>,
+    }).pipe(
+      map(response => response.data.items ?? []),
+      tap(list => this.demandesSubject.next(list)),
       catchError(() => {
         this.demandesSubject.next([]);
         return of([]);
@@ -57,8 +66,12 @@ export class DossierMedicalService {
     if (this.demandesSubject.value.length > 0) return this.demandes$;
     return this.refreshDemandesByPatientId(patientId).pipe(switchMap(() => this.demandes$));
   }
+
   refreshRdvsByPatientId(patientId: number): Observable<RendezVousApi[]> {
-    return this.http.get<RendezVousApi[]>(`${this.API}/rdvs`, { params: { patientId } as any }).pipe(
+    return this.http.get<ApiResponse<RendezVousApi[]>>(`${this.API}/rdvs`, {
+      params: { patientId } as Record<string, string | number>,
+    }).pipe(
+      map(response => response.data),
       map(list => (list ?? []).slice().sort((a, b) => b.dateIso.localeCompare(a.dateIso))),
       tap(list => this.rdvsSubject.next(list)),
       catchError(() => {
@@ -72,6 +85,7 @@ export class DossierMedicalService {
     if (this.rdvsSubject.value.length > 0) return this.rdvs$;
     return this.refreshRdvsByPatientId(patientId).pipe(switchMap(() => this.rdvs$));
   }
+
   loadDossierByUserId(userId: string): Observable<DossierMedical | null> {
     return this.refreshPatientByUserId(userId).pipe(
       switchMap(patient => {

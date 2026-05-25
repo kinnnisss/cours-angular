@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, Subject, combineLatest, map, shareReplay, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, combineLatest, map, of, shareReplay, switchMap, takeUntil } from 'rxjs';
 
 import { RdvCardComponent } from '@shared/ui/rdv-card/rdv-card.component';
 
@@ -9,17 +9,17 @@ import type { RendezVous } from '@features/private/mes-rv/model/rendezvous.model
 import type { RvStatus } from '@features/private/mes-rv/model/rv-status.type';
 
 import { MesRvService } from '@features/private/mes-rv/service/mes-rv.service';
-import { RouterLink } from '@angular/router';
+import { SecurityService } from '@core/service/security.service';
+import { PatientService } from '@core/service/patient.service';
 
 @Component({
   selector: 'app-mes-rv',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RdvCardComponent, AsyncPipe,RouterLink],
+  imports: [NgFor, NgIf, FormsModule, RdvCardComponent, AsyncPipe],
   templateUrl: './mes-rv.component.html',
   styleUrl: './mes-rv.component.css'
 })
 export class MesRvComponent implements OnInit, OnDestroy {
-
   private readonly destroy$ = new Subject<void>();
 
   readonly rdvs$ = new BehaviorSubject<RendezVous[]>([]);
@@ -60,12 +60,29 @@ export class MesRvComponent implements OnInit, OnDestroy {
     shareReplay(1)
   );
 
-  constructor(private readonly mesRvService: MesRvService) {}
+  constructor(
+    private readonly mesRvService: MesRvService,
+    private readonly securityService: SecurityService,
+    private readonly patientService: PatientService
+  ) {}
 
   ngOnInit(): void {
-  this.mesRvService.refreshAll()
-  .pipe(takeUntil(this.destroy$))
-  .subscribe(list => this.rdvs$.next(list));
+    const user = this.securityService.getCurrentUser();
+    if (!user?.id) {
+      this.rdvs$.next([]);
+      return;
+    }
+
+    this.patientService.getByUserId(user.id).pipe(
+      switchMap(patient => {
+        if (!patient?.id) {
+          return of([] as RendezVous[]);
+        }
+
+        return this.mesRvService.refreshByPatientId(String(patient.id));
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe(list => this.rdvs$.next(list));
   }
 
   ngOnDestroy(): void {
@@ -73,15 +90,15 @@ export class MesRvComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onStatusChange(v: '' | RvStatus) {
+  onStatusChange(v: '' | RvStatus): void {
     this.filterStatusSubject.next(v);
   }
 
-  onMonthChange(v: '' | string) {
+  onMonthChange(v: '' | string): void {
     this.filterMonthSubject.next(v);
   }
 
-  onMedecinChange(v: string) {
+  onMedecinChange(v: string): void {
     this.filterMedecinSubject.next(v);
   }
 
@@ -111,10 +128,10 @@ export class MesRvComponent implements OnInit, OnDestroy {
 
   statusLabel(status: RvStatus): string {
     switch (status) {
-      case 'confirme': return 'Confirmé';
-      case 'realise': return 'Réalisé';
+      case 'confirme': return 'Confirme';
+      case 'realise': return 'Realise';
       case 'en_attente': return 'En attente';
-      case 'annule': return 'Annulé';
+      case 'annule': return 'Annule';
     }
   }
 
@@ -129,14 +146,16 @@ export class MesRvComponent implements OnInit, OnDestroy {
 
   cancelRv(rv: RendezVous): void {
     this.mesRvService.cancel(rv.id).subscribe({
-      next: (ok) => {
-        if (!ok) alert('Impossible d’annuler ce rendez-vous.');
-      }
+      next: (updatedRv) => {
+        const nextList = this.rdvs$.value.map(item => item.id === updatedRv.id ? updatedRv : item);
+        this.rdvs$.next(nextList);
+      },
+      error: () => alert('Impossible d annuler ce rendez-vous.'),
     });
   }
 
   downloadReport(rv: RendezVous): void {
     console.log('Rapport (mock) pour', rv.id);
-    alert(`Rapport (mock) généré pour ${rv.id}`);
+    alert(`Rapport (mock) genere pour ${rv.id}`);
   }
 }

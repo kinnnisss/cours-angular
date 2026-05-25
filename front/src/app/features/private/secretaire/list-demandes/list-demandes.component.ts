@@ -31,53 +31,38 @@ export class ListDemandesSecretaireComponent {
 
   readonly pageSize = 8;
 
-  readonly demandes$ = this.refreshSubject.pipe(
-    switchMap(() => this.demandeRvService.getAll()),
-    shareReplay(1)
-  );
-
-  readonly specialites$ = this.demandes$.pipe(
-    map(list => Array.from(new Set(list.map(d => d.specialite))).sort()),
-    shareReplay(1)
-  );
-
-  readonly filteredDemandes$ = combineLatest([
-    this.demandes$,
+  readonly pageData$ = combineLatest([
+    this.refreshSubject,
     this.filterStatus$,
     this.filterSpecialite$,
     this.searchPatient$,
-  ]).pipe(
-    map(([list, status, sp, q]) => {
-      const query = q.trim().toLowerCase();
-      const specialite = (sp ?? '').trim().toLowerCase();
-
-      return list.filter(d => {
-        const okStatus = !status || d.status === status;
-        const okSpec = !specialite || d.specialite.toLowerCase() === specialite;
-        const okPatient =
-          !query ||
-          (d.patientNom ?? '').toLowerCase().includes(query) ||
-          String(d.patientId ?? '').includes(query);
-
-        return okStatus && okSpec && okPatient;
-      });
-    }),
-    shareReplay(1)
-  );
-
-  readonly totalPages$ = this.filteredDemandes$.pipe(
-    map(list => Math.max(1, Math.ceil(list.length / this.pageSize))),
-    shareReplay(1)
-  );
-
-  readonly pagedDemandes$ = combineLatest([
-    this.filteredDemandes$,
     this.currentPage$,
   ]).pipe(
-    map(([list, page]) => {
-      const start = (page - 1) * this.pageSize;
-      return list.slice(start, start + this.pageSize);
-    }),
+    switchMap(([, status, specialite, patientQuery, page]) =>
+      this.demandeRvService.getPage({
+        status,
+        specialite,
+        patientQuery,
+        page: page - 1,
+        size: this.pageSize,
+      })
+    ),
+    shareReplay(1)
+  );
+
+  readonly pagedDemandes$ = this.pageData$.pipe(
+    map(page => page.items),
+    shareReplay(1)
+  );
+
+  readonly specialites$ = this.refreshSubject.pipe(
+    switchMap(() => this.demandeRvService.getPage({ page: 0, size: 100 })),
+    map(page => Array.from(new Set(page.items.map(d => d.specialite))).sort()),
+    shareReplay(1)
+  );
+
+  readonly totalPages$ = this.pageData$.pipe(
+    map(page => Math.max(1, page.totalPages)),
     shareReplay(1)
   );
 
@@ -108,8 +93,8 @@ export class ListDemandesSecretaireComponent {
 
   badgeLabel(s: DemandeStatus): string {
     if (s === 'en_attente') return 'En attente';
-    if (s === 'accepte') return 'Acceptée';
-    return 'Refusée';
+    if (s === 'accepte') return 'Acceptee';
+    return 'Refusee';
   }
 
   badgeClass(s: DemandeStatus): string {
@@ -125,16 +110,16 @@ export class ListDemandesSecretaireComponent {
   }
 
   accept(d: DemandeRv): void {
-    this.demandeRvService.updateStatus(d.id, 'accepte').subscribe(ok => {
-      if (!ok) return alert('Impossible d’accepter la demande.');
-      this.reload();
+    this.demandeRvService.updateStatus(d.id, 'accepte').subscribe({
+      next: () => this.reload(),
+      error: () => alert('Impossible d accepter la demande.'),
     });
   }
 
   refuse(d: DemandeRv): void {
-    this.demandeRvService.updateStatus(d.id, 'refuse').subscribe(ok => {
-      if (!ok) return alert('Impossible de refuser la demande.');
-      this.reload();
+    this.demandeRvService.updateStatus(d.id, 'refuse').subscribe({
+      next: () => this.reload(),
+      error: () => alert('Impossible de refuser la demande.'),
     });
   }
 }

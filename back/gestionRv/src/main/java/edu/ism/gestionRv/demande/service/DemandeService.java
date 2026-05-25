@@ -1,17 +1,26 @@
 package edu.ism.gestionRv.demande.service;
 
+import edu.ism.gestionRv.client.web.dto.DemandeCreateRequestDto;
+import edu.ism.gestionRv.client.web.dto.DemandeResponseDto;
+import edu.ism.gestionRv.client.web.dto.PageResponseDto;
+import edu.ism.gestionRv.client.web.mapper.DemandeMapper;
 import edu.ism.gestionRv.demande.data.entity.Demande;
 import edu.ism.gestionRv.demande.data.repository.DemandeRepository;
+import edu.ism.gestionRv.demande.exception.DemandeNotFoundException;
+import edu.ism.gestionRv.demande.exception.InvalidDemandeStatusException;
+import edu.ism.gestionRv.demande.exception.PatientNotFoundException;
 import edu.ism.gestionRv.patient.data.entity.Patient;
 import edu.ism.gestionRv.patient.data.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -21,130 +30,138 @@ public class DemandeService {
     private final DemandeRepository demandeRepository;
     private final PatientRepository patientRepository;
 
-    /**
-     * Crée une nouvelle demande
-     */
-    public Demande createDemande(Long patientId, LocalDate dateConsultation, String motif, String remarques) {
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient non trouvé avec l'ID: " + patientId));
+    public DemandeResponseDto createDemande(DemandeCreateRequestDto request) {
+        Patient patient = patientRepository.findById(request.patientId())
+                .orElseThrow(() -> new PatientNotFoundException(request.patientId()));
 
-        Demande demande = new Demande();
-        demande.setPatient(patient);
-        demande.setDateConsultation(dateConsultation);
-        demande.setMotif(motif);
-        demande.setRemarques(remarques);
-        demande.setStatut(Demande.StatutDemande.CREEE);
-        demande.setDateCreation(LocalDateTime.now());
-        demande.setDateModification(LocalDateTime.now());
+        Demande demande = Demande.builder()
+                .patient(patient)
+                .dateConsultation(request.date())
+                .heureConsultation(request.heure())
+                .specialite(request.specialite())
+                .motif(request.motif())
+                .remarques(request.remarques())
+                .statut(Demande.StatutDemande.CREEE)
+                .dateCreation(LocalDateTime.now())
+                .dateModification(LocalDateTime.now())
+                .build();
 
-        return demandeRepository.save(demande);
+        return DemandeMapper.toResponseDto(demandeRepository.save(demande));
     }
 
-    /**
-     * Récupère toutes les demandes du jour
-     */
-    public List<Demande> getDemandesDuJour() {
-        return demandeRepository.findDemandesDuJour();
+    public List<DemandeResponseDto> getDemandesDuJour() {
+        return DemandeMapper.toResponseDtoList(demandeRepository.findDemandesDuJour());
     }
 
-    /**
-     * Récupère toutes les demandes du jour pour un patient spécifique
-     */
-    public List<Demande> getDemandesDuJourByPatient(Long patientId) {
-        return demandeRepository.findDemandesDuJourByPatientId(patientId);
+    public List<DemandeResponseDto> getDemandesDuJourByPatient(Long patientId) {
+        return DemandeMapper.toResponseDtoList(demandeRepository.findDemandesDuJourByPatientId(patientId));
     }
 
-    /**
-     * Récupère les demandes avec filtres (date et/ou patient)
-     */
-    public List<Demande> getDemandesWithFilter(Long patientId, LocalDate date) {
-        if (patientId != null && date != null) {
-            return demandeRepository.findByPatientIdAndDateConsultation(patientId, date);
-        } else if (patientId != null) {
-            return demandeRepository.findByPatientId(patientId);
-        } else if (date != null) {
-            return demandeRepository.findByDateConsultation(date);
-        } else {
-            return demandeRepository.findAll();
-        }
+    public PageResponseDto<DemandeResponseDto> getDemandes(
+            Long patientId,
+            LocalDate date,
+            String status,
+            String specialite,
+            String patientQuery,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreation"));
+        List<Demande.StatutDemande> statuses = mapApiStatuses(status);
+        boolean applyStatusFilter = statuses != null && !statuses.isEmpty();
+
+        var pageResult = demandeRepository.searchDemandes(
+                patientId,
+                date,
+                normalizeBlank(specialite),
+                normalizeBlank(patientQuery),
+                applyStatusFilter,
+                applyStatusFilter ? statuses : List.of(Demande.StatutDemande.CREEE),
+                pageable
+        );
+
+        return PageResponseDto.fromPage(pageResult, DemandeMapper::toResponseDto);
     }
 
-    /**
-     * Récupère toutes les demandes
-     */
-    public List<Demande> getAllDemandes() {
-        return demandeRepository.findAll();
+    public DemandeResponseDto getDemandeById(Long id) {
+        return demandeRepository.findById(id)
+                .map(DemandeMapper::toResponseDto)
+                .orElseThrow(() -> new DemandeNotFoundException(id));
     }
 
-    /**
-     * Récupère une demande par ID
-     */
-    public Optional<Demande> getDemandeById(Long id) {
-        return demandeRepository.findById(id);
-    }
-
-    /**
-     * Valide une demande (change le statut de CREEE à VALIDEE)
-     */
-    public Demande validerDemande(Long demandeId) {
+    public DemandeResponseDto validerDemande(Long demandeId) {
         Demande demande = demandeRepository.findById(demandeId)
-                .orElseThrow(() -> new IllegalArgumentException("Demande non trouvée avec l'ID: " + demandeId));
+                .orElseThrow(() -> new DemandeNotFoundException(demandeId));
 
         if (!demande.getStatut().equals(Demande.StatutDemande.CREEE)) {
-            throw new IllegalStateException("Seules les demandes créées peuvent être validées");
+            throw new InvalidDemandeStatusException("Seules les demandes creees peuvent etre validees");
         }
 
         demande.setStatut(Demande.StatutDemande.VALIDEE);
         demande.setDateModification(LocalDateTime.now());
-        return demandeRepository.save(demande);
+        return DemandeMapper.toResponseDto(demandeRepository.save(demande));
     }
 
-    /**
-     * Annule une demande
-     */
-    public Demande annulerDemande(Long demandeId) {
+    public DemandeResponseDto annulerDemande(Long demandeId) {
         Demande demande = demandeRepository.findById(demandeId)
-                .orElseThrow(() -> new IllegalArgumentException("Demande non trouvée avec l'ID: " + demandeId));
+                .orElseThrow(() -> new DemandeNotFoundException(demandeId));
 
         if (demande.getStatut().equals(Demande.StatutDemande.ANNULEE)) {
-            throw new IllegalStateException("Cette demande est déjà annulée");
+            throw new InvalidDemandeStatusException("Cette demande est deja annulee");
         }
 
         demande.setStatut(Demande.StatutDemande.ANNULEE);
         demande.setDateModification(LocalDateTime.now());
-        return demandeRepository.save(demande);
+        return DemandeMapper.toResponseDto(demandeRepository.save(demande));
     }
 
-    /**
-     * Marque une demande comme complétée
-     */
-    public Demande completarDemande(Long demandeId) {
+    public DemandeResponseDto completarDemande(Long demandeId) {
         Demande demande = demandeRepository.findById(demandeId)
-                .orElseThrow(() -> new IllegalArgumentException("Demande non trouvée avec l'ID: " + demandeId));
+                .orElseThrow(() -> new DemandeNotFoundException(demandeId));
 
         if (!demande.getStatut().equals(Demande.StatutDemande.VALIDEE)) {
-            throw new IllegalStateException("Seules les demandes validées peuvent être complétées");
+            throw new InvalidDemandeStatusException("Seules les demandes validees peuvent etre completees");
         }
 
         demande.setStatut(Demande.StatutDemande.COMPLETEE);
         demande.setDateModification(LocalDateTime.now());
-        return demandeRepository.save(demande);
+        return DemandeMapper.toResponseDto(demandeRepository.save(demande));
     }
 
-    /**
-     * Supprime une demande
-     */
     public void deleteDemande(Long demandeId) {
         if (!demandeRepository.existsById(demandeId)) {
-            throw new IllegalArgumentException("Demande non trouvée avec l'ID: " + demandeId);
+            throw new DemandeNotFoundException(demandeId);
         }
         demandeRepository.deleteById(demandeId);
     }
 
-    /**
-     * Récupère les demandes par statut
-     */
-    public List<Demande> getDemandesByStatut(Demande.StatutDemande statut) {
-        return demandeRepository.findByStatut(statut);
+    public List<DemandeResponseDto> getDemandesByStatut(Demande.StatutDemande statut) {
+        return DemandeMapper.toResponseDtoList(demandeRepository.findByStatut(statut));
+    }
+
+    public DemandeResponseDto updateStatus(Long demandeId, String status) {
+        return switch (status) {
+            case "accepte" -> validerDemande(demandeId);
+            case "refuse" -> annulerDemande(demandeId);
+            case "en_attente" -> getDemandeById(demandeId);
+            default -> throw new InvalidDemandeStatusException("Statut non supporte: " + status);
+        };
+    }
+
+    private List<Demande.StatutDemande> mapApiStatuses(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+
+        return switch (status) {
+            case "en_attente" -> List.of(Demande.StatutDemande.CREEE);
+            case "accepte" -> List.of(Demande.StatutDemande.VALIDEE, Demande.StatutDemande.COMPLETEE);
+            case "refuse" -> List.of(Demande.StatutDemande.ANNULEE);
+            default -> throw new InvalidDemandeStatusException("Statut filtre invalide: " + status);
+        };
+    }
+
+    private String normalizeBlank(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 }

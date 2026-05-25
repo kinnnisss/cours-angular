@@ -1,106 +1,65 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { Observable, map, throwError, catchError } from 'rxjs';
 
 import type { DemandeRv } from '@features/private/demande-rv/model/demande-rv.model';
 import type { DemandeRvCreate } from '@features/private/demande-rv/model/demande-create.model';
 import type { DemandeStatus } from '@features/private/demande-rv/model/demande-status.type';
+import type { ApiResponse, PageResponse } from '@core/model/api-response.model';
+import { API_BASE_URL } from '@core/config/api.config';
+
+export interface DemandePageQuery {
+  patientId?: number;
+  date?: string;
+  status?: DemandeStatus | '';
+  specialite?: string;
+  patientQuery?: string;
+  page?: number;
+  size?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class DemandeRvService {
-  private readonly API = 'http://localhost:3001';
-
-  private readonly demandesSubject = new BehaviorSubject<DemandeRv[]>([]);
-  readonly demandes$ = this.demandesSubject.asObservable();
+  private readonly API = `${API_BASE_URL}/demandes`;
 
   constructor(private readonly http: HttpClient) {}
 
-  refreshAll(): Observable<DemandeRv[]> {
-    return this.http.get<DemandeRv[]>(`${this.API}/demandes`).pipe(
-      tap(list => this.demandesSubject.next(list)),
-      catchError(() => {
-        this.demandesSubject.next([]);
-        return of([]);
-      })
+  getPage(query: DemandePageQuery = {}): Observable<PageResponse<DemandeRv>> {
+    const params: Record<string, string | number> = {
+      page: query.page ?? 0,
+      size: query.size ?? 5,
+    };
+
+    if (query.patientId !== undefined) params['patientId'] = query.patientId;
+    if (query.date?.trim()) params['date'] = query.date.trim();
+    if (query.status?.trim()) params['status'] = query.status.trim();
+    if (query.specialite?.trim()) params['specialite'] = query.specialite.trim();
+    if (query.patientQuery?.trim()) params['patientQuery'] = query.patientQuery.trim();
+
+    return this.http.get<ApiResponse<PageResponse<DemandeRv>>>(this.API, { params }).pipe(
+      map(response => response.data)
     );
   }
 
-getAll(): Observable<DemandeRv[]> {
-  if (this.demandesSubject.value.length > 0) return this.demandes$;
-  return this.refreshAll().pipe(switchMap(() => this.demandes$));
-}
-  getById(id: string): Observable<DemandeRv | null> {
-    return this.http.get<DemandeRv>(`${this.API}/demandes/${id}`).pipe(
-      catchError(() =>
-        this.demandes$.pipe(
-          map(list => list.find(d => d.id === id) ?? null)
-        )
-      )
+  getById(id: string | number): Observable<DemandeRv> {
+    return this.http.get<ApiResponse<DemandeRv>>(`${this.API}/${id}`).pipe(
+      map(response => response.data)
     );
   }
 
-  getByPatientId(patientId: number): Observable<DemandeRv[]> {
-    return this.http
-      .get<DemandeRv[]>(`${this.API}/demandes`, { params: { patientId } })
-      .pipe(
-        tap(list => this.demandesSubject.next(list)),
-        catchError(() => {
-          this.demandesSubject.next([]);
-          return of([]);
-        })
-      );
-  }
   create(payload: DemandeRvCreate): Observable<DemandeRv> {
-    return this.http.get<DemandeRv[]>(`${this.API}/demandes`).pipe(
-      map(list => this.nextId(list)),
-      switchMap(newId => {
-        const newDemande: DemandeRv = {
-          id: newId,
-          patientId: payload.patientId,
-          patientNom: payload.patientNom,
-          specialite: payload.specialite,
-          date: payload.date,
-          heure: payload.heure,
-          status: 'en_attente',
-        };
-
-        return this.http.post<DemandeRv>(`${this.API}/demandes`, newDemande).pipe(
-          tap(created => {
-            const current = this.demandesSubject.value;
-            this.demandesSubject.next([created, ...current]);
-          })
-        );
-      }),
-      catchError((err) => {
-        throw err;
+    return this.http.post<ApiResponse<DemandeRv>>(this.API, payload).pipe(
+      map(response => response.data),
+      catchError((error) => {
+        const message = error?.error?.errors?.[0] ?? 'Impossible de creer la demande';
+        return throwError(() => new Error(message));
       })
     );
   }
 
-  updateStatus(id: string, status: DemandeStatus): Observable<boolean> {
-    return this.http.patch<DemandeRv>(`${this.API}/demandes/${id}`, { status }).pipe(
-      tap(updatedDemande => {
-        const list = this.demandesSubject.value;
-        const idx = list.findIndex(d => d.id === id);
-        if (idx === -1) return;
-
-        const updated = [...list];
-        updated[idx] = { ...updated[idx], status: updatedDemande.status };
-        this.demandesSubject.next(updated);
-      }),
-      map(() => true),
-      catchError(() => of(false))
+  updateStatus(id: number | string, status: DemandeStatus): Observable<DemandeRv> {
+    return this.http.patch<ApiResponse<DemandeRv>>(`${this.API}/${id}`, { status }).pipe(
+      map(response => response.data)
     );
-  }
-
-
-  private nextId(list: DemandeRv[]): string {
-    const nums = list
-      .map(d => Number(String(d.id).replace('DEM-', '')))
-      .filter(n => !Number.isNaN(n));
-
-    const next = (nums.length ? Math.max(...nums) : 0) + 1;
-    return `DEM-${String(next).padStart(4, '0')}`;
   }
 }

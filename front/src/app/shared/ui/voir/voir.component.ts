@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-voir',
   standalone: true,
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink, NgClass, NgIf],
   templateUrl: './voir.component.html',
   styleUrl: './voir.component.css',
 })

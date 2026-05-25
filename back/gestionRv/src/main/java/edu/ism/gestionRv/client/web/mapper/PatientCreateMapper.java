@@ -4,16 +4,16 @@ import edu.ism.gestionRv.client.web.dto.PatientCreateRequestDto;
 import edu.ism.gestionRv.client.web.dto.PatientCreateResponseDto;
 import edu.ism.gestionRv.patient.data.entity.Patient;
 
-public class PatientCreateMapper {
+public final class PatientCreateMapper {
 
     private PatientCreateMapper() {
-        // Private constructor to hide the implicit public one
     }
 
     public static PatientCreateResponseDto toDto(Patient patient) {
         if (patient == null) {
             return null;
         }
+
         return new PatientCreateResponseDto(
                 patient.getId(),
                 patient.getUserId(),
@@ -22,21 +22,23 @@ public class PatientCreateMapper {
                 patient.getPrenom(),
                 patient.getTel(),
                 patient.getAdresse(),
-                patient.getAntecedents());
+                patient.getAntecedents()
+        );
     }
 
     public static Patient toEntity(PatientCreateRequestDto dto) {
         if (dto == null) {
             return null;
         }
-        return new Patient(
-                null, // id is null for creation
-                dto.getUserId(),
-                dto.getNumero(),
-                dto.getNom(),
-                dto.getPrenom(),
-                dto.getTel(),
-                dto.getAdresse(),
-                dto.getAntecedents());
+
+        return Patient.builder()
+                .userId(dto.userId())
+                .numero(dto.numero())
+                .nom(dto.nom())
+                .prenom(dto.prenom())
+                .tel(dto.tel())
+                .adresse(dto.adresse())
+                .antecedents(dto.antecedents())
+                .build();
     }
 }

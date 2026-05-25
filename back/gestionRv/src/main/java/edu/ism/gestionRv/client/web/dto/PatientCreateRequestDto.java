@@ -1,83 +1,26 @@
 package edu.ism.gestionRv.client.web.dto;
 
-public class PatientCreateRequestDto {
-    private String userId;
-    private String numero;
-    private String nom;
-    private String prenom;
-    private String tel;
-    private String adresse;
-    private String antecedents;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-    // Constructeurs
-    public PatientCreateRequestDto() {
-    }
-
-    public PatientCreateRequestDto(String userId, String numero, String nom, String prenom, String tel, String adresse,
-            String antecedents) {
-        this.userId = userId;
-        this.numero = numero;
-        this.nom = nom;
-        this.prenom = prenom;
-        this.tel = tel;
-        this.adresse = adresse;
-        this.antecedents = antecedents;
-    }
-
-    // Getters et Setters
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public String getPrenom() {
-        return prenom;
-    }
-
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
-
-    public String getTel() {
-        return tel;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    public String getAdresse() {
-        return adresse;
-    }
-
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
-    }
-
-    public String getAntecedents() {
-        return antecedents;
-    }
-
-    public void setAntecedents(String antecedents) {
-        this.antecedents = antecedents;
-    }
+public record PatientCreateRequestDto(
+        String userId,
+        @NotBlank(message = "Le numero du patient est obligatoire")
+        @Pattern(regexp = "^PAT-\\d{3,4}$", message = "Le numero doit respecter le format PAT-001")
+        String numero,
+        @NotBlank(message = "Le nom est obligatoire")
+        @Size(min = 2, max = 50, message = "Le nom doit contenir entre 2 et 50 caracteres")
+        String nom,
+        @NotBlank(message = "Le prenom est obligatoire")
+        @Size(min = 2, max = 50, message = "Le prenom doit contenir entre 2 et 50 caracteres")
+        String prenom,
+        @NotBlank(message = "Le telephone est obligatoire")
+        @Pattern(regexp = "^\\d{9}$", message = "Le telephone doit contenir 9 chiffres")
+        String tel,
+        @NotBlank(message = "L'adresse est obligatoire")
+        @Size(min = 5, max = 120, message = "L'adresse doit contenir entre 5 et 120 caracteres")
+        String adresse,
+        String antecedents
+) {
 }

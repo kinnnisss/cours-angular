@@ -3,12 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
 
 import type { UserRequest, UserResponse, User } from '@core/model/user.model';
+import type { ApiResponse } from '@core/model/api-response.model';
+import { API_BASE_URL } from '@core/config/api.config';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
-  private readonly API = 'http://localhost:3001';
+  private readonly API = `${API_BASE_URL}/auth`;
 
   constructor(private readonly http: HttpClient) {}
+
   login(payload: UserRequest): Observable<UserResponse> {
     const email = payload.email?.trim().toLowerCase() ?? '';
     const password = payload.password ?? '';
@@ -17,31 +20,18 @@ export class SecurityService {
       return throwError(() => new Error('Email ou mot de passe requis'));
     }
 
-    return this.http
-      .get<User[]>(`${this.API}/users`, { params: { email } })
-      .pipe(
-        map((users) => {
-          const u = users.find(x => x.email.toLowerCase() === email);
+    return this.http.post<ApiResponse<UserResponse>>(`${this.API}/login`, { email, password }).pipe(
+      map(response => response.data),
+      catchError((error) => {
+        const message = error?.error?.errors?.[0] ?? 'Email ou mot de passe incorrect';
+        return throwError(() => new Error(message));
+      })
+    );
+  }
 
-          if (!u || u.password !== password) {
-            throw new Error('Email ou mot de passe incorrect');
-          }
-
-          const response: UserResponse = {
-            token: 'fake-jwt-token',
-            user: u,
-          };
-
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-
-          return response;
-        }),
-        catchError((err) => {
-          const msg = err?.message || 'Erreur de connexion au serveur';
-          return throwError(() => new Error(msg));
-        })
-      );
+  persistSession(response: UserResponse): void {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
   }
 
   logout(): void {

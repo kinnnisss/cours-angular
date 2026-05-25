@@ -2,7 +2,7 @@ export interface User {
   id: string;
   nom: string;
   email: string;
-  password: string;
+  password?: string;
   role: UserRole;
 }
 export type UserRole = 'patient' | 'admin' | 'medecin'|'secretaire';

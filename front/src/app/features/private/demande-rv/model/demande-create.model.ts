@@ -1,8 +1,8 @@
 export interface DemandeRvCreate {
-  patientId: string;
-  patientNom: string;
+  patientId: number;
   specialite: string;
   date: string;
   heure: string;
   motif?: string;
+  remarques?: string;
 }
